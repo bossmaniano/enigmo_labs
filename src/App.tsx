@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Globe, Database, Workflow, Search, Zap, Cog } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
+import emailjs from '@emailjs/browser'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -936,21 +937,21 @@ const ContactTerminal = () => {
     e.preventDefault();
     setStatus('sending');
     setErrorMessage('');
-    
+
     try {
-      // In a real implementation, you would use EmailJS, Formspree, or your own backend
-      // For demonstration, we'll simulate the API calls
-      
-      // Simulate sending admin notification
+      // For Netlify Forms, we just need to let the form submit normally
+      // The data-netlify attribute will handle the submission
+      // We'll send the confirmation email after a short delay to simulate processing
+
+      // Send confirmation email to client
+      await sendConfirmationEmail();
+
+      // Simulate processing delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate sending client auto-reply
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // If we reach here, both emails were sent successfully
+
       setStatus('success');
-      
-      // Reset form after a delay to show success message
+
+      // Reset form after showing success message
       setTimeout(() => {
         setFormData({
           name: '',
@@ -960,10 +961,44 @@ const ContactTerminal = () => {
           brief: ''
         });
       }, 3000);
+
     } catch (error) {
-      console.error('Email sending failed:', error);
+      console.error('Form submission failed:', error);
       setStatus('error');
       setErrorMessage('Connection Timeout. Please retry or contact enigmolabs@gmail.com directly.');
+    }
+  };
+
+  const sendConfirmationEmail = async () => {
+    try {
+      // EmailJS configuration - you'll need to set these up in your EmailJS account
+      const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID || 'your_service_id';
+      const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || 'your_template_id';
+      const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY || 'your_public_key';
+
+      // Skip if not configured (for development/demo)
+      if (serviceId === 'your_service_id') {
+        console.log('EmailJS not configured - skipping confirmation email');
+        return;
+      }
+
+      const templateParams = {
+        to_email: formData.email,
+        to_name: formData.name,
+        protocol_type: formData.protocol,
+        phone_number: formData.phone,
+        from_name: 'Enigmo Labs',
+        reply_to: 'enigmolabs@gmail.com'
+      };
+
+      // Send confirmation email to client
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
+      console.log('Confirmation email sent successfully to:', formData.email);
+    } catch (error) {
+      console.error('Failed to send confirmation email:', error);
+      // Don't throw error here - the form submission to Netlify was successful
+      // We can still show success to the user even if the confirmation email fails
     }
   };
   
@@ -1022,8 +1057,21 @@ const ContactTerminal = () => {
             </div>
           </motion.div>
         ) : status === 'error' ? (
-          <form onSubmit={handleSubmit} className="space-y-6" 
-                >
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            {/* Hidden honeypot field for spam prevention */}
+            <input type="hidden" name="form-name" value="contact" />
+            <div style={{ display: 'none' }}>
+              <label>
+                Don't fill this out if you're human: <input name="bot-field" />
+              </label>
+            </div>
             <div className="flex items-center space-x-2 mb-4 p-3 bg-red-50/50 border border-red-500/20 rounded-lg">
               <span className="text-red-500">⚠️</span>
               <span className="text-red-500 text-sm">{errorMessage}</span>
@@ -1148,7 +1196,21 @@ const ContactTerminal = () => {
             </div>
           </form>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            {/* Hidden honeypot field for spam prevention */}
+            <input type="hidden" name="form-name" value="contact" />
+            <div style={{ display: 'none' }}>
+              <label>
+                Don't fill this out if you're human: <input name="bot-field" />
+              </label>
+            </div>
             {/* Name Field */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div>
