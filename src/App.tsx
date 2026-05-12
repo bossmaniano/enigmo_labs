@@ -206,7 +206,7 @@ return (
       
       {/* Update scroll progress bar */}
       <motion.div
-        always={true}
+        
         style={{
           width: `${Math.min(window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100, 100)}%`
         }}
@@ -1023,7 +1023,7 @@ const ContactTerminal = () => {
           </motion.div>
         ) : status === 'error' ? (
           <form onSubmit={handleSubmit} className="space-y-6" 
-                className="border-border-red-500/20">
+                >
             <div className="flex items-center space-x-2 mb-4 p-3 bg-red-50/50 border border-red-500/20 rounded-lg">
               <span className="text-red-500">⚠️</span>
               <span className="text-red-500 text-sm">{errorMessage}</span>
@@ -1130,12 +1130,12 @@ const ContactTerminal = () => {
             <div className="flex justify-center">
               <motion.button
                 type="submit"
-                disabled={status === 'sending'}
+                disabled={(status as string) === 'sending'}
                 className={`
                   px-8 py-3 text-sm font-medium tracking-wider rounded-lg
                   transition-all duration-300
                   border border-white/20
-                  ${status === 'sending'
+                  ${(status as string) === 'sending'
                     ? 'bg-black/50 text-white/50 cursor-not-allowed'
                     : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:text-white'
                   }
@@ -1143,7 +1143,7 @@ const ContactTerminal = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {status === 'sending' ? 'Sending...' : 'Initialize Protocol'}
+                {(status as string) === 'sending' ? 'Sending...' : 'Initialize Protocol'}
               </motion.button>
             </div>
           </form>
@@ -1249,12 +1249,12 @@ const ContactTerminal = () => {
             <div className="flex justify-center">
               <motion.button
                 type="submit"
-                disabled={status === 'sending'}
+                disabled={(status as string) === 'sending'}
                 className={`
                   px-8 py-3 text-sm font-medium tracking-wider rounded-lg
                   transition-all duration-300
                   border border-white/20
-                  ${status === 'sending'
+                  ${(status as string) === 'sending'
                     ? 'bg-black/50 text-white/50 cursor-not-allowed'
                     : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:text-white'
                   }
@@ -1262,7 +1262,7 @@ const ContactTerminal = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {status === 'sending' ? 'Sending...' : 'Initialize Protocol'}
+                {(status as string) === 'sending' ? 'Sending...' : 'Initialize Protocol'}
               </motion.button>
             </div>
           </form>
