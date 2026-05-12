@@ -956,10 +956,10 @@ try {
       // Custom subject for architect notification
       formPayload.append('_subject', `NEW ENIGMO PROTOCOL: ${formData.Name}`);
 
-      // Guard: skip real submission if Formspree ID is not configured
-      if (!formspreeFormId) {
+      // Guard: skip real submission if Formspree ID is not configured or is the placeholder
+      if (!formspreeFormId || formspreeFormId === 'YOUR_FORM_ID') {
         console.log('Formspree form ID not configured — simulating submission for development/demo.');
-        console.log('To enable live submissions, set VITE_FORMSPREE_FORM_ID in your .env file.');
+        console.log('To enable live submissions, replace YOUR_FORM_ID in .env with your actual Formspree form ID.');
         // Simulate success in dev mode
         setStatus('success');
         setDisplayedLines(0);
