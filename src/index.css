@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-egyptian-blue: #1034A6;
+  --color-midnight: #05070a;
+  --color-charcoal: #0a0d12;
+  --font-family-sans: Geist, Inter, system-ui, sans-serif;
+  --font-family-mono: 'Space Mono', 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-black font-sans;
+  }
+
+  .terminal {
+    @apply font-mono bg-gray-100 border border-gray-300 rounded-lg p-4 text-green-600 text-sm;
+  }
+
+  .technical-label {
+    @apply font-mono text-xs uppercase tracking-wider text-gray-600;
+  }
+}
+
+@layer components {
+  .container-border {
+    @apply border border-black/10;
+  }
+
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(16, 52, 166, 0.2), 0 0 60px rgba(16, 52, 166, 0.1);
+    transform: translateY(-2px);
+  }
+}
