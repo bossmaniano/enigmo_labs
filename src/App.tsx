@@ -972,9 +972,9 @@ const ContactTerminal = () => {
   const sendConfirmationEmail = async () => {
     try {
       // EmailJS configuration - you'll need to set these up in your EmailJS account
-      const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID || 'your_service_id';
-      const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || 'your_template_id';
-      const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY || 'your_public_key';
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'your_service_id';
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'your_template_id';
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'your_public_key';
 
       // Skip if not configured (for development/demo)
       if (serviceId === 'your_service_id') {
