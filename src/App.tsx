@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Globe, Database, Workflow, Search, Zap, Cog } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
-import emailjs from '@emailjs/browser'
+
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -915,16 +915,17 @@ const AlignedTestimonialsMarquee = () => {
 // Contact Terminal Section
 const ContactTerminal = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    protocol: '',
-    brief: ''
+    Name: '',
+    Email: '',
+    Phone: '',
+    Protocol: '',
+    Brief: ''
   });
-  
+
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  
+  const [displayedLines, setDisplayedLines] = useState(0);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -932,35 +933,60 @@ const ContactTerminal = () => {
       [name]: value
     }));
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('sending');
     setErrorMessage('');
 
     try {
-      // For Netlify Forms, we just need to let the form submit normally
-      // The data-netlify attribute will handle the submission
-      // We'll send the confirmation email after a short delay to simulate processing
+      // Build Formspree payload with dual-email routing
+      const formPayload = new FormData();
+      formPayload.append('Name', formData.Name);
+      formPayload.append('Email', formData.Email);
+      formPayload.append('Phone', formData.Phone);
+      formPayload.append('Protocol', formData.Protocol);
+      formPayload.append('Brief', formData.Brief);
+      // Hidden metadata for subject line
+      formPayload.append('_subject', `NEW ENIGMO PROTOCOL: ${formData.Name}`);
+      // Dual-email delivery routing
+      formPayload.append('_to', 'enigmolabs@gmail.com');
+      formPayload.append('_replyto', formData.Email);
+      // Formspree redirect confirmation
+      formPayload.append('_template', 'dual-email-template');
+      // Client confirmation auto-reply metadata
+      formPayload.append('_autoresponse', 'true');
+      formPayload.append('_autoresponse:to', formData.Email);
+      formPayload.append('_autoresponse:subject', 'Enigmo Labs | Protocol Initialized');
+      formPayload.append('_autoresponse:body', `Hello ${formData.Name},\n\nYour brief has been received. Our lead architect, Ian Assah, will reach out via the phone number provided or this email within 12 hours.\n\nThe Future is Engineered.`);
 
-      // Send confirmation email to client
-      await sendConfirmationEmail();
+      // Submit to Formspree via fetch
+      const response = await fetch('https://formspree.io/f/YOUR_ID_HERE', {
+        method: 'POST',
+        body: formPayload,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
 
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(`Formspree returned ${response.status}`);
+      }
 
+      // Trigger success terminal with typewriter animation
       setStatus('success');
+      setDisplayedLines(0);
 
-      // Reset form after showing success message
+      // Reset form after success
       setTimeout(() => {
         setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          protocol: '',
-          brief: ''
+          Name: '',
+          Email: '',
+          Phone: '',
+          Protocol: '',
+          Brief: ''
         });
-      }, 3000);
+      }, 8000);
 
     } catch (error) {
       console.error('Form submission failed:', error);
@@ -969,98 +995,94 @@ const ContactTerminal = () => {
     }
   };
 
-  const sendConfirmationEmail = async () => {
-    try {
-      // EmailJS configuration - you'll need to set these up in your EmailJS account
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
+  // Typewriter effect for success terminal lines
+  const terminalLines = [
+    '[SYSTEM]: PACKET ENCRYPTED AND DISPATCHED.',
+    '[SYSTEM]: ARCHITECT NOTIFIED (enigmolabs@gmail.com).',
+    '[SYSTEM]: CONFIRMATION SENT TO CLIENT.',
+    '[SYSTEM]: STATUS: STANDBY FOR CONTACT WITHIN 12H.'
+  ];
 
-      // Skip if not configured (for development/demo)
-      if (!serviceId || !templateId || !publicKey) {
-        console.log('EmailJS not configured - skipping confirmation email');
-        console.log('To enable, create a .env file with VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY');
-        return;
-      }
-
-      // Initialize EmailJS with the public key
-      emailjs.init(publicKey);
-
-      const templateParams = {
-        to_email: formData.email,
-        to_name: formData.name,
-        protocol_type: formData.protocol,
-        phone_number: formData.phone,
-        from_name: 'Enigmo Labs',
-        reply_to: 'enigmolabs@gmail.com'
-      };
-
-      // Send confirmation email to client
-      await emailjs.send(serviceId, templateId, templateParams);
-
-      console.log('Confirmation email sent successfully to:', formData.email);
-    } catch (error) {
-      console.error('Failed to send confirmation email:', error);
-      // Don't throw error here - the form submission to Netlify was successful
-      // We can still show success to the user even if the confirmation email fails
+  // Animate terminal lines appearing one by one
+  useEffect(() => {
+    if (status === 'success' && displayedLines < terminalLines.length) {
+      const timer = setTimeout(() => {
+        setDisplayedLines(prev => prev + 1);
+      }, 800);
+      return () => clearTimeout(timer);
     }
-  };
-  
+  }, [status, displayedLines, terminalLines.length]);
+
   const resetForm = () => {
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      protocol: '',
-      brief: ''
+      Name: '',
+      Email: '',
+      Phone: '',
+      Protocol: '',
+      Brief: ''
     });
     setStatus('idle');
+    setDisplayedLines(0);
   };
-  
+
   return (
-    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 bg-[#05070a]">
-      <div className="max-w-7xl mx-auto">
+    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 bg-midnight">
+      <div className="max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold mb-4 text-white">Contact Terminal</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4 text-white font-mono">Contact Terminal</h2>
+          <p className="text-gray-400 max-w-xl mx-auto font-mono">
             Initialize your project protocol through our secure engineering interface
           </p>
         </motion.div>
-        
+
         {status === 'success' ? (
+          // Success Terminal with Typewriter Effect
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, type: "spring" }}
-            className="text-center py-12"
+            transition={{ duration: 0.6, type: 'spring' }}
+            className="font-mono bg-gray-900/50 border border-white/10 rounded-xl p-8 text-center min-h-[280px] flex flex-col items-center justify-center"
           >
-            <div className="space-y-4">
-              <div className="text-2xl font-bold text-egyptian-blue mb-2">
-                [ENIGMO_OS]: CONNECTION STABLISHED
-              </div>
-              <div className="text-lg text-egyptian-blue/80 mb-2">
-                [ENIGMO_OS]: ARCHIVE CREATED FOR {formData.name || 'CLIENT'}
-              </div>
-              <div className="text-lg text-egyptian-blue/80">
-                [ENIGMO_OS]: NOTIFICATION DISPATCHED TO {formData.phone || 'CONTACT'}
-              </div>
-              <motion.button
-                onClick={resetForm}
-                className="mt-6 px-4 py-2 text-sm font-medium text-white border border-white/20 rounded-lg 
-                          hover:bg-egyptian-blue/20 hover:text-white transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Reset Terminal
-              </motion.button>
+            <div className="space-y-3 max-w-md mx-auto">
+              {terminalLines.slice(0, displayedLines).map((line, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="text-green-400 text-sm"
+                >
+                  {line}
+                </motion.div>
+              ))}
+              {displayedLines < terminalLines.length && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
+                  className="text-green-400 text-sm"
+                >
+                  ▊
+                </motion.span>
+              )}
             </div>
+            <motion.button
+              onClick={resetForm}
+              className="mt-8 px-6 py-2 text-sm font-medium text-white border border-white/20 rounded-lg
+                        hover:bg-egyptian-blue/20 hover:text-white transition-all duration-300 font-mono"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              [ RESET TERMINAL ]
+            </motion.button>
           </motion.div>
         ) : status === 'error' ? (
+          // Error State - Return to form
           <form
             name="contact"
             method="POST"
@@ -1069,137 +1091,133 @@ const ContactTerminal = () => {
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            {/* Hidden honeypot field for spam prevention */}
             <input type="hidden" name="form-name" value="contact" />
             <div style={{ display: 'none' }}>
               <label>
                 Don't fill this out if you're human: <input name="bot-field" />
               </label>
             </div>
-            <div className="flex items-center space-x-2 mb-4 p-3 bg-red-50/50 border border-red-500/20 rounded-lg">
-              <span className="text-red-500">⚠️</span>
-              <span className="text-red-500 text-sm">{errorMessage}</span>
+
+            <div className="text-center mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg font-mono text-sm">
+              <span className="text-red-400">⚠️</span>
+              <span className="text-red-400 ml-2">{errorMessage}</span>
             </div>
-            
-            {/* Form fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Name Field */}
+
+            {/* Form fields - Single Column Command Terminal Layout */}
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Name
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Full Name
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="Name"
+                  value={formData.Name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
-                  placeholder="Full Name"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
+                  placeholder="Enter full name..."
                 />
               </div>
-              
-              {/* Email Field */}
+
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Work Email
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Official Email
                 </label>
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
+                  name="Email"
+                  value={formData.Email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
                   placeholder="you@company.com"
                 />
               </div>
-              
-              {/* Phone Field */}
+
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Phone Number
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Phone Number
                 </label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  name="Phone"
+                  value={formData.Phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
                   placeholder="+254..."
                 />
               </div>
-              
-              {/* Protocol Dropdown */}
+
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Project Protocol
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Protocol Tier
                 </label>
                 <select
-                  name="protocol"
-                  value={formData.protocol}
+                  name="Protocol"
+                  value={formData.Protocol}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
                 >
-                  <option value="">Select Protocol Type</option>
-                  <option value="Foundations">Foundations</option>
-                  <option value="Intelligence">Intelligence</option>
-                  <option value="Enigma">Enigma</option>
-                  <option value="Bespoke">Bespoke</option>
+                  <option value="" className="bg-black text-white">Select Protocol Type</option>
+                  <option value="Foundations" className="bg-black text-white">Foundations</option>
+                  <option value="Intelligence" className="bg-black text-white">Intelligence</option>
+                  <option value="Enigma" className="bg-black text-white">Enigma</option>
+                  <option value="Bespoke" className="bg-black text-white">Bespoke</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Technical Brief
+                </label>
+                <textarea
+                  name="Brief"
+                  value={formData.Brief}
+                  onChange={handleChange}
+                  required
+                  rows={5}
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm resize-none"
+                  placeholder="Describe your project requirements and technical specifications..."
+                />
+              </div>
             </div>
-            
-            {/* Brief Field */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Brief
-              </label>
-              <textarea
-                name="brief"
-                value={formData.brief}
-                onChange={handleChange}
-                required
-                rows={4}
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                          focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                          text-white placeholder-gray-400 resize-none"
-                placeholder="Describe your project requirements..."
-              />
-            </div>
-            
+
             {/* Submit Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-2">
               <motion.button
                 type="submit"
-                disabled={(status as string) === 'sending'}
+                disabled={status === 'sending'}
                 className={`
-                  px-8 py-3 text-sm font-medium tracking-wider rounded-lg
-                  transition-all duration-300
+                  font-mono px-8 py-3 text-sm font-bold tracking-[0.2em] rounded-lg
                   border border-white/20
-                  ${(status as string) === 'sending'
-                    ? 'bg-black/50 text-white/50 cursor-not-allowed'
-                    : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:text-white'
+                  transition-all duration-300
+                  ${status === 'sending'
+                    ? 'bg-black/70 text-white/40 cursor-not-allowed'
+                    : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:border-egyptian-blue/50 active:scale-[0.98]'
                   }
                 `}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={status !== 'sending' ? { scale: 1.02 } : {}}
+                whileTap={status !== 'sending' ? { scale: 0.98 } : {}}
               >
-                {(status as string) === 'sending' ? 'Sending...' : 'Initialize Protocol'}
+                {status === 'sending' ? '▸ INITIALIZING PROTOCOL...' : '[ INITIALIZE PROTOCOL ]'}
               </motion.button>
             </div>
           </form>
         ) : (
+          // Default State - Clean Form
           <form
             name="contact"
             method="POST"
@@ -1208,127 +1226,123 @@ const ContactTerminal = () => {
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            {/* Hidden honeypot field for spam prevention */}
             <input type="hidden" name="form-name" value="contact" />
             <div style={{ display: 'none' }}>
               <label>
                 Don't fill this out if you're human: <input name="bot-field" />
               </label>
             </div>
-            {/* Name Field */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            {/* Form fields - Single Column Command Terminal Layout */}
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Name
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Full Name
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="Name"
+                  value={formData.Name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
-                  placeholder="Full Name"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
+                  placeholder="Enter full name..."
                 />
               </div>
-              
-              {/* Email Field */}
+
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Work Email
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Official Email
                 </label>
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
+                  name="Email"
+                  value={formData.Email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
                   placeholder="you@company.com"
                 />
               </div>
-              
-              {/* Phone Field */}
+
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Phone Number
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Phone Number
                 </label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  name="Phone"
+                  value={formData.Phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
                   placeholder="+254..."
                 />
               </div>
-              
-              {/* Protocol Dropdown */}
+
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Project Protocol
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Protocol Tier
                 </label>
                 <select
-                  name="protocol"
-                  value={formData.protocol}
+                  name="Protocol"
+                  value={formData.Protocol}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                            text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm"
                 >
-                  <option value="">Select Protocol Type</option>
-                  <option value="Foundations">Foundations</option>
-                  <option value="Intelligence">Intelligence</option>
-                  <option value="Enigma">Enigma</option>
-                  <option value="Bespoke">Bespoke</option>
+                  <option value="" className="bg-black text-white">Select Protocol Type</option>
+                  <option value="Foundations" className="bg-black text-white">Foundations</option>
+                  <option value="Intelligence" className="bg-black text-white">Intelligence</option>
+                  <option value="Enigma" className="bg-black text-white">Enigma</option>
+                  <option value="Bespoke" className="bg-black text-white">Bespoke</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-xs font-mono text-gray-500 mb-2 uppercase tracking-wider">
+                  &gt; Technical Brief
+                </label>
+                <textarea
+                  name="Brief"
+                  value={formData.Brief}
+                  onChange={handleChange}
+                  required
+                  rows={5}
+                  className="w-full px-4 py-3 bg-black/60 border border-white/10 rounded-lg
+                            focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50 focus:border-egyptian-blue
+                            text-white placeholder-gray-500 font-mono text-sm resize-none"
+                  placeholder="Describe your project requirements and technical specifications..."
+                />
+              </div>
             </div>
-            
-            {/* Brief Field */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Brief
-              </label>
-              <textarea
-                name="brief"
-                value={formData.brief}
-                onChange={handleChange}
-                required
-                rows={4}
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg 
-                          focus:outline-none focus:ring-2 focus:ring-egyptian-blue/50
-                          text-white placeholder-gray-400 resize-none"
-                placeholder="Describe your project requirements..."
-              />
-            </div>
-            
+
             {/* Submit Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-2">
               <motion.button
                 type="submit"
-                disabled={(status as string) === 'sending'}
+                disabled={status === 'sending'}
                 className={`
-                  px-8 py-3 text-sm font-medium tracking-wider rounded-lg
-                  transition-all duration-300
+                  font-mono px-8 py-3 text-sm font-bold tracking-[0.2em] rounded-lg
                   border border-white/20
-                  ${(status as string) === 'sending'
-                    ? 'bg-black/50 text-white/50 cursor-not-allowed'
-                    : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:text-white'
+                  transition-all duration-300
+                  ${status === 'sending'
+                    ? 'bg-black/70 text-white/40 cursor-not-allowed'
+                    : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:border-egyptian-blue/50 active:scale-[0.98]'
                   }
                 `}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={status !== 'sending' ? { scale: 1.02 } : {}}
+                whileTap={status !== 'sending' ? { scale: 0.98 } : {}}
               >
-                {(status as string) === 'sending' ? 'Sending...' : 'Initialize Protocol'}
+                {status === 'sending' ? '▸ INITIALIZING PROTOCOL...' : '[ INITIALIZE PROTOCOL ]'}
               </motion.button>
             </div>
           </form>
