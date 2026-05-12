@@ -940,68 +940,64 @@ const ContactTerminal = () => {
     setErrorMessage('');
 
 try {
-       const formspreeFormId = import.meta.env.VITE_FORMSPREE_FORM_ID || '';
+      const formspreeFormId = import.meta.env.VITE_FORMSPREE_FORM_ID || '';
 
-       // Build Formspree payload with dual-email routing
-       const formPayload = new FormData();
-       formPayload.append('Name', formData.Name);
-       formPayload.append('Email', formData.Email);
-       formPayload.append('Phone', formData.Phone);
-       formPayload.append('Protocol', formData.Protocol);
-       formPayload.append('Brief', formData.Brief);
-       // Hidden metadata for subject line
-       formPayload.append('_subject', `NEW ENIGMO PROTOCOL: ${formData.Name}`);
-       // Dual-email delivery routing
-       formPayload.append('_to', 'enigmolabs@gmail.com');
-       formPayload.append('_replyto', formData.Email);
-       // Formspree redirect confirmation
-       formPayload.append('_template', 'dual-email-template');
-       // Client confirmation auto-reply metadata
-       formPayload.append('_autoresponse', 'true');
-       formPayload.append('_autoresponse:to', formData.Email);
-       formPayload.append('_autoresponse:subject', 'Enigmo Labs | Protocol Initialized');
-       formPayload.append('_autoresponse:body', `Hello ${formData.Name},\n\nYour brief has been received. Our lead architect, Ian Assah, will reach out via the phone number provided or this email within 12 hours.\n\nThe Future is Engineered.`);
+      // Build Formspree payload — only fields Formspree actually supports
+      // Formspree accepts: field names matching the form + _subject + _next
+      // Dual-email info is included as visible fields so the architect sees
+      // the client's email/phone in the notification, and the subject is
+      // customised so the client auto-reply can be configured in Formspree.
+      const formPayload = new FormData();
+      formPayload.append('Name', formData.Name);
+      formPayload.append('Email', formData.Email);
+      formPayload.append('Phone', formData.Phone);
+      formPayload.append('Protocol', formData.Protocol);
+      formPayload.append('Brief', formData.Brief);
+      // Custom subject for architect notification
+      formPayload.append('_subject', `NEW ENIGMO PROTOCOL: ${formData.Name}`);
+      // Redirect after submission (optional — remove if not using redirect)
+      formPayload.append('_next', '/thank-you');
 
-       // Guard: skip real submission if Formspree ID is not configured
-       if (!formspreeFormId) {
-         console.log('Formspree form ID not configured — simulating submission for development/demo.');
-         console.log('To enable live submissions, add VITE_FORMSPREE_FORM_ID to your .env file.');
-         // Simulate success in dev mode
-         setStatus('success');
-         setDisplayedLines(0);
-         setTimeout(() => {
-           setFormData({ Name: '', Email: '', Phone: '', Protocol: '', Brief: '' });
-         }, 8000);
-         return;
-       }
+      // Guard: skip real submission if Formspree ID is not configured
+      if (!formspreeFormId) {
+        console.log('Formspree form ID not configured — simulating submission for development/demo.');
+        console.log('To enable live submissions, set VITE_FORMSPREE_FORM_ID in your .env file.');
+        // Simulate success in dev mode
+        setStatus('success');
+        setDisplayedLines(0);
+        setTimeout(() => {
+          setFormData({ Name: '', Email: '', Phone: '', Protocol: '', Brief: '' });
+        }, 8000);
+        return;
+      }
 
-       // Submit to Formspree via fetch
-       const response = await fetch(`https://formspree.io/f/${formspreeFormId}`, {
-         method: 'POST',
-         body: formPayload,
-         headers: {
-           'Accept': 'application/json'
-         }
-       });
+      // Submit to Formspree via fetch
+      const response = await fetch(`https://formspree.io/f/${formspreeFormId}`, {
+        method: 'POST',
+        body: formPayload,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
 
-       if (!response.ok) {
-         throw new Error(`Formspree returned ${response.status}`);
-       }
+      if (!response.ok) {
+        throw new Error(`Formspree returned ${response.status}`);
+      }
 
-       // Trigger success terminal with typewriter animation
-       setStatus('success');
-       setDisplayedLines(0);
+      // Trigger success terminal with typewriter animation
+      setStatus('success');
+      setDisplayedLines(0);
 
-       // Reset form after success
-       setTimeout(() => {
-         setFormData({
-           Name: '',
-           Email: '',
-           Phone: '',
-           Protocol: '',
-           Brief: ''
-         });
-       }, 8000);
+      // Reset form after success
+      setTimeout(() => {
+        setFormData({
+          Name: '',
+          Email: '',
+          Phone: '',
+          Protocol: '',
+          Brief: ''
+        });
+      }, 8000);
 
     } catch (error) {
       console.error('Form submission failed:', error);
