@@ -972,15 +972,19 @@ const ContactTerminal = () => {
   const sendConfirmationEmail = async () => {
     try {
       // EmailJS configuration - you'll need to set these up in your EmailJS account
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'your_service_id';
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'your_template_id';
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'your_public_key';
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
 
       // Skip if not configured (for development/demo)
-      if (serviceId === 'your_service_id') {
+      if (!serviceId || !templateId || !publicKey) {
         console.log('EmailJS not configured - skipping confirmation email');
+        console.log('To enable, create a .env file with VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, and VITE_EMAILJS_PUBLIC_KEY');
         return;
       }
+
+      // Initialize EmailJS with the public key
+      emailjs.init(publicKey);
 
       const templateParams = {
         to_email: formData.email,
@@ -992,7 +996,7 @@ const ContactTerminal = () => {
       };
 
       // Send confirmation email to client
-      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      await emailjs.send(serviceId, templateId, templateParams);
 
       console.log('Confirmation email sent successfully to:', formData.email);
     } catch (error) {
