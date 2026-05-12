@@ -943,7 +943,7 @@ try {
       const formspreeFormId = import.meta.env.VITE_FORMSPREE_FORM_ID || '';
 
       // Build Formspree payload — only fields Formspree actually supports
-      // Formspree accepts: field names matching the form + _subject + _next
+      // Formspree accepts: field names matching the form + _subject
       // Dual-email info is included as visible fields so the architect sees
       // the client's email/phone in the notification, and the subject is
       // customised so the client auto-reply can be configured in Formspree.
@@ -955,8 +955,6 @@ try {
       formPayload.append('Brief', formData.Brief);
       // Custom subject for architect notification
       formPayload.append('_subject', `NEW ENIGMO PROTOCOL: ${formData.Name}`);
-      // Redirect after submission (optional — remove if not using redirect)
-      formPayload.append('_next', '/thank-you');
 
       // Guard: skip real submission if Formspree ID is not configured
       if (!formspreeFormId) {
