@@ -1213,8 +1213,11 @@ const ContactTerminal = () => {
                  whileTap={(status as string) !== 'sending' ? { scale: 0.98 } : {}}
                >
                  {(status as string) === 'sending' ? '▸ INITIALIZING PROTOCOL...' : '[ INITIALIZE PROTOCOL ]'}
-               </motion.button>
-             </div>
+</motion.button>
+            </div>
+          </form>
+        ) : (
+          // Default State - Clean Form
           <form
             name="contact"
             method="POST"
@@ -1322,26 +1325,26 @@ const ContactTerminal = () => {
               </div>
             </div>
 
-{/* Submit Button - Default State */}
-             <div className="flex justify-center pt-2">
-               <motion.button
-                 type="submit"
-                 disabled={(status as string) === 'sending'}
-                 className={`
-                   font-mono px-8 py-3 text-sm font-bold tracking-[0.2em] rounded-lg
-                   border border-white/20
-                   transition-all duration-300
-                   ${(status as string) === 'sending'
-                     ? 'bg-black/70 text-white/40 cursor-not-allowed'
-                     : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:border-egyptian-blue/50 active:scale-[0.98]'
-                   }
-                 `}
-                 whileHover={(status as string) !== 'sending' ? { scale: 1.02 } : {}}
-                 whileTap={(status as string) !== 'sending' ? { scale: 0.98 } : {}}
-               >
-                 {(status as string) === 'sending' ? '▸ INITIALIZING PROTOCOL...' : '[ INITIALIZE PROTOCOL ]'}
-               </motion.button>
-             </div>
+            {/* Submit Button - Default State */}
+            <div className="flex justify-center pt-2">
+              <motion.button
+                type="submit"
+                disabled={(status as string) === 'sending'}
+                className={`
+                  font-mono px-8 py-3 text-sm font-bold tracking-[0.2em] rounded-lg
+                  border border-white/20
+                  transition-all duration-300
+                  ${(status as string) === 'sending'
+                    ? 'bg-black/70 text-white/40 cursor-not-allowed'
+                    : 'bg-transparent text-white hover:bg-egyptian-blue/20 hover:border-egyptian-blue/50 active:scale-[0.98]'
+                  }
+                `}
+                whileHover={(status as string) !== 'sending' ? { scale: 1.02 } : {}}
+                whileTap={(status as string) !== 'sending' ? { scale: 0.98 } : {}}
+              >
+                {(status as string) === 'sending' ? '▸ INITIALIZING PROTOCOL...' : '[ INITIALIZE PROTOCOL ]'}
+              </motion.button>
+            </div>
           </form>
         )}
       </div>
