@@ -2,6 +2,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Globe, Database, Workflow, Search, Zap, Cog } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 
+// Module-level scroll helper — shared across all components
+const smoothScrollTo = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,14 +46,11 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  // Smooth scroll helper
-  const smoothScrollTo = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false); // Close mobile menu when clicking a link
-    }
-  };
+// Smooth scroll helper
+   const smoothScrollToLocal = (id: string) => {
+     smoothScrollTo(id);
+     setIsMobileMenuOpen(false); // Close mobile menu when clicking a link
+   };
 
 return (
     <>
@@ -67,7 +71,7 @@ return (
           <div className="flex justify-between items-center py-4">
             {/* Left Side - Brand */}
             <motion.div
-              onClick={() => smoothScrollTo('hero')}
+              onClick={() => smoothScrollToLocal('hero')}
               className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
@@ -88,8 +92,8 @@ return (
                 return (
                   <motion.div
                     key={link}
-                    onClick={() => smoothScrollTo(sectionId)}
-                    className={`flex items-center space-x-2 text-sm font-mono tracking-widest uppercase 
+onClick={() => smoothScrollToLocal(sectionId)}
+                     className={`flex items-center space-x-2 text-sm font-mono tracking-widest uppercase
                               ${isActive ? 'text-egyptian-blue' : 'text-black/60'}
                               hover:text-egyptian-blue transition-colors duration-200
                               relative`}
@@ -179,10 +183,10 @@ return (
                     return (
                       <motion.div
                         key={link}
-                        onClick={() => {
-                          smoothScrollTo(sectionId);
-                          setIsMobileMenuOpen(false);
-                        }}
+onClick={() => {
+                           smoothScrollToLocal('contact');
+                           setIsMobileMenuOpen(false);
+                         }}
                         className={`flex items-center space-x-3 py-3 px-4 rounded-lg 
                                   ${isActive ? 'bg-egyptian-blue/20' : 'bg-transparent'}
                                   hover:bg-black/10 transition-colors duration-200`}
