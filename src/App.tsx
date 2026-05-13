@@ -341,99 +341,92 @@ const GlobalHero = () => {
    }, [terms.length]);
 
    return (
-     <section id="hero" className="relative min-h-screen overflow-hidden bg-white">
-       {/* Soft background gradient */}
-       <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
-
-{/* Large faded blurry sphere on the LEFT — full on desktop, subtle on mobile */}
-        <motion.div
-          initial={{ opacity: 0, x: -60 }}
-          animate={{ opacity: 0.18, x: 0 }}
-          transition={{ duration: 1.2, delay: 0.2 }}
-          className="absolute left-[-20%] top-[-15%] w-[80vw] h-[80vw] sm:w-[60vw] sm:h-[60vw] lg:w-[110%] lg:h-[110%] z-0"
-        >
-          <div className="w-full h-full blur-[50px] sm:blur-[70px] lg:blur-[120px] opacity-60">
-            <AnimatedSphere />
-          </div>
-        </motion.div>
-
-        {/* Secondary smaller sphere — left-mid for depth */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 0.08, x: 0 }}
-          transition={{ duration: 1.4, delay: 0.5 }}
-          className="absolute left-[10%] top-[25%] w-20 h-20 sm:w-28 sm:h-28 lg:w-[30vw] lg:h-[30vw] lg:max-w-[400px] lg:max-h-[400px] z-0"
-        >
-          <div className="w-full h-full blur-[40px] sm:blur-[50px] lg:blur-[80px] opacity-50">
-            <AnimatedSphere />
-          </div>
-        </motion.div>
-
-        {/* Text Content — centered on mobile, right-shifted on desktop */}
-        <div className="relative z-10 flex items-center min-h-screen px-4 sm:px-8 lg:px-16 py-16 sm:py-24 lg:py-0">
-          <div className="max-w-2xl mx-auto lg:mx-0 lg:ml-[14%]">
-           <motion.div
-             initial={{ opacity: 0, y: 30 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8, delay: 0.1 }}
-             className="mb-6"
-           >
-             <span className="inline-flex items-center px-3 py-1.5 bg-egyptian-blue/10 border border-egyptian-blue/20 rounded-full text-xs font-mono text-egyptian-blue tracking-wider uppercase">
-               <span className="w-1.5 h-1.5 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
-               Based in Nairobi, Kenya
-             </span>
-           </motion.div>
-
-           <motion.h1
-             className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.08] text-black mb-6"
-             initial={{ opacity: 0, y: 30 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.9, delay: 0.25 }}
-           >
-             Deciphering Complexity.
-             <br />
-             <span className="relative">
-               Engineering{" "}
-               <AnimatePresence mode="wait">
-                 <motion.span
-                   key={terms[currentTerm]}
-                   initial={{ y: 25, opacity: 0, filter: "blur(6px)" }}
-                   animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-                   exit={{ y: -25, opacity: 0, filter: "blur(6px)" }}
-                   transition={{ duration: 0.55, ease: "easeInOut" }}
-                   className="text-egyptian-blue inline-block"
-                 >
-                   {terms[currentTerm]}
-                 </motion.span>
-               </AnimatePresence>
-             </span>
-           </motion.h1>
-
-           <motion.p
-             className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl mb-10"
-             initial={{ opacity: 0, y: 25 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.9, delay: 0.45 }}
-           >
-             Welcome to Enigmo Labs. We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
-           </motion.p>
-
-           <motion.div
-             initial={{ opacity: 0, y: 25 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.9, delay: 0.65 }}
-           >
-             <button
-               onClick={() => smoothScrollTo('contact')}
-               className="group relative inline-flex items-center gap-2 px-8 py-4 bg-egyptian-blue text-black font-semibold rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden"
-             >
-               <span className="relative z-10">Initialize Project</span>
-               <span className="relative z-10 w-5 h-5 rounded-full border-2 border-black/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
-                 →
-               </span>
-             </button>
-           </motion.div>
+     <section id="hero" className="relative min-h-screen overflow-hidden">
+       {/* Full-screen background sphere */}
+       <motion.div
+         initial={{ opacity: 0, scale: 0.8 }}
+         animate={{ opacity: 1, scale: 1 }}
+         transition={{ duration: 1.2 }}
+         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] max-w-none z-0"
+       >
+         <div className="relative w-full h-full">
+           <AnimatedSphere />
          </div>
+       </motion.div>
+
+       {/* Deep overlay gradient */}
+       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1a] via-[#0d1525] to-[#090e1a] z-[1]" />
+
+       {/* Soft blue glow behind sphere */}
+       <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 0.6 }}
+         transition={{ duration: 2, delay: 0.5 }}
+         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] max-w-[800px] max-h-[800px] rounded-full blur-[150px] bg-egyptian-blue/20 z-[2] pointer-events-none"
+       />
+
+       {/* Content overlay */}
+       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-8 text-center">
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.6, delay: 0.1 }}
+           className="mb-5"
+         >
+           <span className="inline-flex items-center px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-xs font-mono text-white/80 tracking-[0.2em] uppercase">
+             <span className="w-1.5 h-1.5 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
+             Based in Nairobi, Kenya
+           </span>
+         </motion.div>
+
+         <motion.h1
+           className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold leading-[0.95] text-white mb-6 max-w-4xl"
+           initial={{ opacity: 0, y: 30 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 1, delay: 0.25 }}
+         >
+           <span className="block text-white/90">Deciphering</span>
+           <span className="block mt-2">
+             <span className="text-white/90">Engineering </span>
+             <AnimatePresence mode="wait">
+               <motion.span
+                 key={terms[currentTerm]}
+                 initial={{ y: 20, opacity: 0, filter: "blur(8px)" }}
+                 animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                 exit={{ y: -20, opacity: 0, filter: "blur(8px)" }}
+                 transition={{ duration: 0.6, ease: "easeInOut" }}
+                 className="text-transparent bg-clip-text bg-gradient-to-r from-egyptian-blue via-egyptian-blue-light to-egyptian-blue inline-block"
+               >
+                 {terms[currentTerm]}
+               </motion.span>
+             </AnimatePresence>
+           </span>
+         </motion.h1>
+
+         <motion.p
+           className="text-base sm:text-lg text-white/55 max-w-xl leading-relaxed mb-12"
+           initial={{ opacity: 0, y: 25 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 1, delay: 0.5 }}
+         >
+           We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
+         </motion.p>
+
+         <motion.div
+           initial={{ opacity: 0, y: 25 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 1, delay: 0.75 }}
+         >
+           <button
+             onClick={() => smoothScrollTo('contact')}
+             className="group relative inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-egyptian-blue to-egyptian-blue-dark text-white font-semibold rounded-full hover:opacity-90 transition-all duration-300 shadow-[0_0_40px_rgba(0,0,0,0.3)] hover:shadow-[0_0_60px_rgba(0,0,0,0.4)]"
+           >
+             <span className="relative z-10 tracking-wide">Initialize Project</span>
+             <span className="relative z-10 w-5 h-5 rounded-full border border-white/40 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
+               →
+             </span>
+           </button>
+         </motion.div>
        </div>
      </section>
    )
