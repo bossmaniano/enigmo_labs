@@ -342,30 +342,36 @@ const GlobalHero = () => {
 
    return (
      <section id="hero" className="relative min-h-screen overflow-hidden bg-white">
-       {/* Background gradient overlay for depth */}
+       {/* Soft background gradient */}
        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
 
-       {/* Large decorative sphere — bleeds beyond container for overlay effect */}
+       {/* Faded blurry sphere on the LEFT side */}
        <motion.div
-         initial={{ opacity: 0, scale: 0.6 }}
-         animate={{ opacity: 1, scale: 1 }}
-         transition={{ duration: 1, delay: 0.3 }}
-         className="absolute -right-[10%] top-[-5%] w-[85vw] h-[85vw] max-w-[900px] max-h-[900px] z-0 overflow-visible"
+         initial={{ opacity: 0, x: -40 }}
+         animate={{ opacity: 0.15, x: 0 }}
+         transition={{ duration: 1.2, delay: 0.2 }}
+         className="absolute left-[-8%] top-[-10%] w-[60vw] h-[60vw] max-w-[550px] max-h-[550px] z-0"
        >
-         <AnimatedSphere />
+         <div className="w-full h-full blur-[80px] opacity-60">
+           <AnimatedSphere />
+         </div>
        </motion.div>
 
-       {/* Subtle background glow behind sphere */}
+       {/* Secondary smaller sphere — left-mid overlap for depth */}
        <motion.div
-         initial={{ opacity: 0 }}
-         animate={{ opacity: 0.4 }}
-         transition={{ duration: 1.5, delay: 0.5 }}
-         className="absolute right-0 top-0 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[120px] bg-egyptian-blue/20 z-[1]"
-       />
+         initial={{ opacity: 0, x: -20 }}
+         animate={{ opacity: 0.08, x: 0 }}
+         transition={{ duration: 1.4, delay: 0.5 }}
+         className="absolute left-[10%] top-[20%] w-[25vw] h-[25vw] max-w-[220px] max-h-[220px] z-0"
+       >
+         <div className="w-full h-full blur-[60px] opacity-50">
+           <AnimatedSphere />
+         </div>
+       </motion.div>
 
-       {/* Left Text Content — always on top */}
-       <div className="relative z-10 flex items-center min-h-screen px-4 sm:px-8 lg:px-16">
-         <div className="max-w-2xl">
+       {/* Text Content — centered on right side, always on top */}
+       <div className="relative z-10 flex items-center min-h-screen px-4 sm:px-8 lg:px-16 py-16 sm:py-24 lg:py-0">
+         <div className="max-w-2xl mx-auto lg:mx-0 lg:ml-[12%]">
            <motion.div
              initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: 1, y: 0 }}
@@ -379,7 +385,7 @@ const GlobalHero = () => {
            </motion.div>
 
            <motion.h1
-             className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] text-black mb-6"
+             className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.08] text-black mb-6"
              initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.9, delay: 0.25 }}
@@ -422,7 +428,7 @@ const GlobalHero = () => {
                className="group relative inline-flex items-center gap-2 px-8 py-4 bg-egyptian-blue text-black font-semibold rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden"
              >
                <span className="relative z-10">Initialize Project</span>
-               <span className="relative z-10 w-5 h-5 rounded-full border-2 border-black/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300">
+               <span className="relative z-10 w-5 h-5 rounded-full border-2 border-black/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
                  →
                </span>
              </button>
