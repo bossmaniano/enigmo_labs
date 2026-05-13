@@ -128,16 +128,16 @@ return (
                 </motion.div>
               </button>
               
-              {/* Action Button - Consultation */}
-              <motion.button
-                onClick={() => window.location.href = 'mailto:enigmolabs@gmail.com?subject=Consultation%20Request'}
-                className="px-4 py-2 text-sm font-medium text-black border border-black/20 rounded-lg 
-                          hover:bg-egyptian-blue/20 hover:text-egyptian-blue transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Consultation
-              </motion.button>
+               {/* Action Button - Consultation */}
+               <motion.button
+                 onClick={() => smoothScrollTo('contact')}
+                 className="px-4 py-2 text-sm font-medium text-black border border-black/20 rounded-lg 
+                           hover:bg-egyptian-blue/20 hover:text-egyptian-blue transition-all duration-300"
+                 whileHover={{ scale: 1.05 }}
+                 whileTap={{ scale: 0.95 }}
+               >
+                 Consultation
+               </motion.button>
             </div>
           </div>
           
@@ -399,14 +399,15 @@ const GlobalHero = () => {
             </motion.p>
           </div>
 
-          <motion.button
-            className="px-8 py-4 bg-egyptian-blue text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl hover-glow"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            Initialize Project
-          </motion.button>
+           <motion.button
+             onClick={() => smoothScrollTo('contact')}
+             className="px-8 py-4 bg-egyptian-blue text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl hover-glow"
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8, delay: 0.8 }}
+           >
+             Initialize Project
+           </motion.button>
         </div>
       </motion.div>
     </section>
@@ -721,8 +722,8 @@ const ProtocolPricing = () => {
     }
   ]
 
-  return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+return (
+     <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -839,8 +840,8 @@ const AlignedTestimonialsMarquee = () => {
 
   const [hoveredColumn, setHoveredColumn] = useState<number | null>(null)
 
-  return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+return (
+     <section id="testimonials" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
