@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, Globe, Database, Workflow, Search, Zap, Cog } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 // Module-level scroll helper — shared across all components
 const smoothScrollTo = (id: string) => {
@@ -225,208 +225,105 @@ onClick={() => {
   )
 }
 
-// Neural Pulse Animation Component
-
-
-const AnimatedSphere = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameRef = useRef(0);
+// The Enigmo Protocol Section
+const GlobalHero = () => {
+  const terms = ["Intelligence", "Websites", "Systems", "Agents", "Automation"];
+  const [currentTerm, setCurrentTerm] = useState(0);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const interval = setInterval(() => {
+      setCurrentTerm((prev) => (prev + 1) % terms.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [terms.length]);
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+return (
+    <section id="hero" className="relative min-h-screen overflow-hidden bg-black">
+      {/* Dark gradient background with soft blob */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_30%,#1a2340_0%,#0a0f1a_50%,#050914_100%)]" />
 
-    const chars = "░▒▓█▀▄▌▐│─┤├┴┬╭╮╰╯";
-    let time = 0;
+      {/* Soft purple-blue glow blob — top right */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 0.4, scale: 1 }}
+        transition={{ duration: 1.5, delay: 0.3 }}
+        className="absolute -top-[20%] -right-[10%] w-[70vw] h-[70vw] max-w-[700px] max-h-[700px] rounded-full blur-[120px] bg-gradient-to-br from-egyptian-blue/30 to-purple-600/20 z-0 pointer-events-none"
+      />
 
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-    };
+      {/* Secondary soft glow — bottom left */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 0.2, scale: 1 }}
+        transition={{ duration: 1.8, delay: 0.6 }}
+        className="absolute -bottom-[30%] -left-[10%] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] bg-gradient-to-tr from-egyptian-blue/20 to-indigo-600/15 z-0 pointer-events-none"
+      />
 
-    resize();
-    window.addEventListener("resize", resize);
+      {/* Center content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-8 py-20 sm:py-28 lg:py-32 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-6"
+        >
+          <span className="inline-flex items-center px-3 py-1.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full text-xs font-mono text-white/70 tracking-[0.2em] uppercase">
+            <span className="w-1.5 h-1.5 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
+            Based in Nairobi, Kenya
+          </span>
+        </motion.div>
 
-    const render = () => {
-      const rect = canvas.getBoundingClientRect();
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, rect.width, rect.height);
+        <motion.h1
+          className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] font-bold leading-[0.95] text-white mb-5 max-w-4xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.2 }}
+        >
+          <span className="block text-white/95">Deciphering Complexity.</span>
+          <span className="block mt-2 text-white/95">
+            Engineering{" "}
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={terms[currentTerm]}
+                initial={{ y: 20, opacity: 0, filter: "blur(8px)" }}
+                animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                exit={{ y: -20, opacity: 0, filter: "blur(8px)" }}
+                transition={{ duration: 0.55, ease: "easeInOut" }}
+                className="bg-gradient-to-r from-egyptian-blue to-egyptian-blue-light bg-clip-text text-transparent"
+              >
+                {terms[currentTerm]}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+        </motion.h1>
 
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const radius = Math.min(rect.width, rect.height) * 0.525;
+        <motion.p
+          className="text-base sm:text-lg text-white/45 max-w-xl leading-relaxed mb-12"
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.45 }}
+        >
+          We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
+        </motion.p>
 
-      ctx.font = "12px monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-
-      const points: { x: number; y: number; z: number; char: string }[] = [];
-
-      // Generate sphere points
-      for (let phi = 0; phi < Math.PI * 2; phi += 0.15) {
-        for (let theta = 0; theta < Math.PI; theta += 0.15) {
-          const x = Math.sin(theta) * Math.cos(phi + time * 0.5);
-          const y = Math.sin(theta) * Math.sin(phi + time * 0.5);
-          const z = Math.cos(theta);
-
-          // Rotate around Y axis
-          const rotY = time * 0.3;
-          const newX = x * Math.cos(rotY) - z * Math.sin(rotY);
-          const newZ = x * Math.sin(rotY) + z * Math.cos(rotY);
-
-          // Rotate around X axis
-          const rotX = time * 0.2;
-          const newY = y * Math.cos(rotX) - newZ * Math.sin(rotX);
-          const finalZ = y * Math.sin(rotX) + newZ * Math.cos(rotX);
-
-          const depth = (finalZ + 1) / 2;
-          const charIndex = Math.floor(depth * (chars.length - 1));
-
-          points.push({
-            x: centerX + newX * radius,
-            y: centerY + newY * radius,
-            z: finalZ,
-            char: chars[charIndex],
-          });
-        }
-      }
-
-      // Sort by z for depth
-      points.sort((a, b) => a.z - b.z);
-
-      // Draw points
-      points.forEach((point) => {
-        const alpha = 0.2 + (point.z + 1) * 0.4;
-        ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
-        ctx.fillText(point.char, point.x, point.y);
-      });
-
-      time += 0.02;
-      frameRef.current = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      cancelAnimationFrame(frameRef.current);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full"
-      style={{ display: "block" }}
-    />
-  );
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.7 }}
+        >
+          <button
+            onClick={() => smoothScrollTo('contact')}
+            className="group relative inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-egyptian-blue to-egyptian-blue-dark text-white font-semibold rounded-full hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+          >
+            <span className="relative z-10 tracking-wide">Initialize Project</span>
+            <span className="relative z-10 w-5 h-5 rounded-full border border-white/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
+              →
+            </span>
+          </button>
+        </motion.div>
+      </div>
+    </section>
+  )
 }
-
-const GlobalHero = () => {
-   const terms = ["Intelligence", "Websites", "Systems", "Agents", "Automation"];
-   const [currentTerm, setCurrentTerm] = useState(0);
-
-   useEffect(() => {
-     const interval = setInterval(() => {
-       setCurrentTerm((prev) => (prev + 1) % terms.length);
-     }, 3000);
-     return () => clearInterval(interval);
-   }, [terms.length]);
-
-   return (
-     <section id="hero" className="relative min-h-screen overflow-hidden bg-black">
-       {/* Dark gradient background with soft blob */}
-       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_30%,#1a2340_0%,#0a0f1a_50%,#050914_100%)]" />
-
-       {/* Soft purple-blue glow blob — top right */}
-       <motion.div
-         initial={{ opacity: 0, scale: 0.5 }}
-         animate={{ opacity: 0.4, scale: 1 }}
-         transition={{ duration: 1.5, delay: 0.3 }}
-         className="absolute -top-[20%] -right-[10%] w-[70vw] h-[70vw] max-w-[700px] max-h-[700px] rounded-full blur-[120px] bg-gradient-to-br from-egyptian-blue/30 to-purple-600/20 z-0 pointer-events-none"
-       />
-
-       {/* Secondary soft glow — bottom left */}
-       <motion.div
-         initial={{ opacity: 0, scale: 0.5 }}
-         animate={{ opacity: 0.2, scale: 1 }}
-         transition={{ duration: 1.8, delay: 0.6 }}
-         className="absolute -bottom-[30%] -left-[10%] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] bg-gradient-to-tr from-egyptian-blue/20 to-indigo-600/15 z-0 pointer-events-none"
-       />
-
-       {/* Center content */}
-       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-8 py-20 sm:py-28 lg:py-32 text-center">
-         <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6, delay: 0.1 }}
-           className="mb-6"
-         >
-           <span className="inline-flex items-center px-3 py-1.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full text-xs font-mono text-white/70 tracking-[0.2em] uppercase">
-             <span className="w-1.5 h-1.5 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
-             Based in Nairobi, Kenya
-           </span>
-         </motion.div>
-
-         <motion.h1
-           className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] font-bold leading-[0.95] text-white mb-5 max-w-4xl"
-           initial={{ opacity: 0, y: 30 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.9, delay: 0.2 }}
-         >
-           <span className="block text-white/95">Deciphering Complexity.</span>
-           <span className="block mt-2 text-white/95">
-             Engineering{" "}
-             <AnimatePresence mode="wait">
-               <motion.span
-                 key={terms[currentTerm]}
-                 initial={{ y: 20, opacity: 0, filter: "blur(8px)" }}
-                 animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-                 exit={{ y: -20, opacity: 0, filter: "blur(8px)" }}
-                 transition={{ duration: 0.55, ease: "easeInOut" }}
-                 className="bg-gradient-to-r from-egyptian-blue to-egyptian-blue-light bg-clip-text text-transparent"
-               >
-                 {terms[currentTerm]}
-               </motion.span>
-             </AnimatePresence>
-           </span>
-         </motion.h1>
-
-         <motion.p
-           className="text-base sm:text-lg text-white/45 max-w-xl leading-relaxed mb-12"
-           initial={{ opacity: 0, y: 25 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.9, delay: 0.45 }}
-         >
-           We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
-         </motion.p>
-
-         <motion.div
-           initial={{ opacity: 0, y: 25 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.9, delay: 0.7 }}
-         >
-           <button
-             onClick={() => smoothScrollTo('contact')}
-             className="group relative inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-egyptian-blue to-egyptian-blue-dark text-white font-semibold rounded-full hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[0_0_50px_rgba(0,0,0,0.5)]"
-           >
-             <span className="relative z-10 tracking-wide">Initialize Project</span>
-             <span className="relative z-10 w-5 h-5 rounded-full border border-white/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
-               →
-             </span>
-           </button>
-         </motion.div>
-       </div>
-     </section>
-   )
- }
 
 // The Enigmo Protocol Section
 const EnigmoProtocol = () => {
