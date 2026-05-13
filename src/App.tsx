@@ -345,33 +345,33 @@ const GlobalHero = () => {
        {/* Soft background gradient */}
        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
 
-       {/* Faded blurry sphere on the LEFT side */}
-       <motion.div
-         initial={{ opacity: 0, x: -40 }}
-         animate={{ opacity: 0.15, x: 0 }}
-         transition={{ duration: 1.2, delay: 0.2 }}
-         className="absolute left-[-8%] top-[-10%] w-[60vw] h-[60vw] max-w-[550px] max-h-[550px] z-0"
-       >
-         <div className="w-full h-full blur-[80px] opacity-60">
-           <AnimatedSphere />
-         </div>
-       </motion.div>
+{/* Faded blurry sphere on the LEFT side — small on mobile, large on desktop */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 0.15, x: 0 }}
+          transition={{ duration: 1.2, delay: 0.2 }}
+          className="absolute left-[-5%] top-[-5%] w-32 h-32 lg:w-[55vw] lg:h-[55vw] lg:max-w-[700px] lg:max-h-[700px] z-0"
+        >
+          <div className="w-full h-full blur-[60px] lg:blur-[100px] opacity-60">
+            <AnimatedSphere />
+          </div>
+        </motion.div>
 
-       {/* Secondary smaller sphere — left-mid overlap for depth */}
-       <motion.div
-         initial={{ opacity: 0, x: -20 }}
-         animate={{ opacity: 0.08, x: 0 }}
-         transition={{ duration: 1.4, delay: 0.5 }}
-         className="absolute left-[10%] top-[20%] w-[25vw] h-[25vw] max-w-[220px] max-h-[220px] z-0"
-       >
-         <div className="w-full h-full blur-[60px] opacity-50">
-           <AnimatedSphere />
-         </div>
-       </motion.div>
+        {/* Secondary smaller sphere — left-mid overlap for depth */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 0.08, x: 0 }}
+          transition={{ duration: 1.4, delay: 0.5 }}
+          className="absolute left-[5%] top-[25%] w-16 h-16 lg:w-[25vw] lg:h-[25vw] lg:max-w-[320px] lg:max-h-[320px] z-0"
+        >
+          <div className="w-full h-full blur-[40px] lg:blur-[70px] opacity-50">
+            <AnimatedSphere />
+          </div>
+        </motion.div>
 
-       {/* Text Content — centered on right side, always on top */}
-       <div className="relative z-10 flex items-center min-h-screen px-4 sm:px-8 lg:px-16 py-16 sm:py-24 lg:py-0">
-         <div className="max-w-2xl mx-auto lg:mx-0 lg:ml-[12%]">
+        {/* Text Content — centered on mobile, right-shifted on desktop */}
+        <div className="relative z-10 flex items-center min-h-screen px-4 sm:px-8 lg:px-16 py-16 sm:py-24 lg:py-0">
+          <div className="max-w-2xl mx-auto lg:mx-0 lg:ml-[14%]">
            <motion.div
              initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: 1, y: 0 }}
