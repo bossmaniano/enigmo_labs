@@ -341,61 +341,57 @@ const GlobalHero = () => {
    }, [terms.length]);
 
    return (
-     <section id="hero" className="relative min-h-screen overflow-hidden">
-       {/* Full-screen background sphere */}
-       <motion.div
-         initial={{ opacity: 0, scale: 0.8 }}
-         animate={{ opacity: 1, scale: 1 }}
-         transition={{ duration: 1.2 }}
-         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] max-w-none z-0"
-       >
-         <div className="relative w-full h-full">
-           <AnimatedSphere />
-         </div>
-       </motion.div>
+     <section id="hero" className="relative min-h-screen overflow-hidden bg-black">
+       {/* Dark gradient background with soft blob */}
+       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_30%,#1a2340_0%,#0a0f1a_50%,#050914_100%)]" />
 
-       {/* Deep overlay gradient */}
-       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1a] via-[#0d1525] to-[#090e1a] z-[1]" />
-
-       {/* Soft blue glow behind sphere */}
+       {/* Soft purple-blue glow blob — top right */}
        <motion.div
-         initial={{ opacity: 0 }}
-         animate={{ opacity: 0.6 }}
-         transition={{ duration: 2, delay: 0.5 }}
-         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] max-w-[800px] max-h-[800px] rounded-full blur-[150px] bg-egyptian-blue/20 z-[2] pointer-events-none"
+         initial={{ opacity: 0, scale: 0.5 }}
+         animate={{ opacity: 0.4, scale: 1 }}
+         transition={{ duration: 1.5, delay: 0.3 }}
+         className="absolute -top-[20%] -right-[10%] w-[70vw] h-[70vw] max-w-[700px] max-h-[700px] rounded-full blur-[120px] bg-gradient-to-br from-egyptian-blue/30 to-purple-600/20 z-0 pointer-events-none"
        />
 
-       {/* Content overlay */}
-       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-8 text-center">
+       {/* Secondary soft glow — bottom left */}
+       <motion.div
+         initial={{ opacity: 0, scale: 0.5 }}
+         animate={{ opacity: 0.2, scale: 1 }}
+         transition={{ duration: 1.8, delay: 0.6 }}
+         className="absolute -bottom-[30%] -left-[10%] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] bg-gradient-to-tr from-egyptian-blue/20 to-indigo-600/15 z-0 pointer-events-none"
+       />
+
+       {/* Center content */}
+       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-8 py-20 sm:py-28 lg:py-32 text-center">
          <motion.div
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.6, delay: 0.1 }}
-           className="mb-5"
+           className="mb-6"
          >
-           <span className="inline-flex items-center px-3 py-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-xs font-mono text-white/80 tracking-[0.2em] uppercase">
+           <span className="inline-flex items-center px-3 py-1.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full text-xs font-mono text-white/70 tracking-[0.2em] uppercase">
              <span className="w-1.5 h-1.5 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
              Based in Nairobi, Kenya
            </span>
          </motion.div>
 
          <motion.h1
-           className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold leading-[0.95] text-white mb-6 max-w-4xl"
+           className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] font-bold leading-[0.95] text-white mb-5 max-w-4xl"
            initial={{ opacity: 0, y: 30 }}
            animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 1, delay: 0.25 }}
+           transition={{ duration: 0.9, delay: 0.2 }}
          >
-           <span className="block text-white/90">Deciphering</span>
-           <span className="block mt-2">
-             <span className="text-white/90">Engineering </span>
+           <span className="block text-white/95">Deciphering Complexity.</span>
+           <span className="block mt-2 text-white/95">
+             Engineering{" "}
              <AnimatePresence mode="wait">
                <motion.span
                  key={terms[currentTerm]}
                  initial={{ y: 20, opacity: 0, filter: "blur(8px)" }}
                  animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
                  exit={{ y: -20, opacity: 0, filter: "blur(8px)" }}
-                 transition={{ duration: 0.6, ease: "easeInOut" }}
-                 className="text-transparent bg-clip-text bg-gradient-to-r from-egyptian-blue via-egyptian-blue-light to-egyptian-blue inline-block"
+                 transition={{ duration: 0.55, ease: "easeInOut" }}
+                 className="bg-gradient-to-r from-egyptian-blue to-egyptian-blue-light bg-clip-text text-transparent"
                >
                  {terms[currentTerm]}
                </motion.span>
@@ -404,10 +400,10 @@ const GlobalHero = () => {
          </motion.h1>
 
          <motion.p
-           className="text-base sm:text-lg text-white/55 max-w-xl leading-relaxed mb-12"
+           className="text-base sm:text-lg text-white/45 max-w-xl leading-relaxed mb-12"
            initial={{ opacity: 0, y: 25 }}
            animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 1, delay: 0.5 }}
+           transition={{ duration: 0.9, delay: 0.45 }}
          >
            We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
          </motion.p>
@@ -415,14 +411,14 @@ const GlobalHero = () => {
          <motion.div
            initial={{ opacity: 0, y: 25 }}
            animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 1, delay: 0.75 }}
+           transition={{ duration: 0.9, delay: 0.7 }}
          >
            <button
              onClick={() => smoothScrollTo('contact')}
-             className="group relative inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-egyptian-blue to-egyptian-blue-dark text-white font-semibold rounded-full hover:opacity-90 transition-all duration-300 shadow-[0_0_40px_rgba(0,0,0,0.3)] hover:shadow-[0_0_60px_rgba(0,0,0,0.4)]"
+             className="group relative inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-egyptian-blue to-egyptian-blue-dark text-white font-semibold rounded-full hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[0_0_50px_rgba(0,0,0,0.5)]"
            >
              <span className="relative z-10 tracking-wide">Initialize Project</span>
-             <span className="relative z-10 w-5 h-5 rounded-full border border-white/40 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
+             <span className="relative z-10 w-5 h-5 rounded-full border border-white/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300 text-sm">
                →
              </span>
            </button>
