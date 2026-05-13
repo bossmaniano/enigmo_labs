@@ -345,26 +345,26 @@ const GlobalHero = () => {
        {/* Soft background gradient */}
        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
 
-{/* Faded blurry sphere on the LEFT side — small on mobile, large on desktop */}
+{/* Large faded blurry sphere on the LEFT — full on desktop, subtle on mobile */}
         <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 0.15, x: 0 }}
+          initial={{ opacity: 0, x: -60 }}
+          animate={{ opacity: 0.18, x: 0 }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="absolute left-[-5%] top-[-5%] w-32 h-32 lg:w-[55vw] lg:h-[55vw] lg:max-w-[700px] lg:max-h-[700px] z-0"
+          className="absolute left-[-20%] top-[-15%] w-[80vw] h-[80vw] sm:w-[60vw] sm:h-[60vw] lg:w-[110%] lg:h-[110%] z-0"
         >
-          <div className="w-full h-full blur-[60px] lg:blur-[100px] opacity-60">
+          <div className="w-full h-full blur-[50px] sm:blur-[70px] lg:blur-[120px] opacity-60">
             <AnimatedSphere />
           </div>
         </motion.div>
 
-        {/* Secondary smaller sphere — left-mid overlap for depth */}
+        {/* Secondary smaller sphere — left-mid for depth */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 0.08, x: 0 }}
           transition={{ duration: 1.4, delay: 0.5 }}
-          className="absolute left-[5%] top-[25%] w-16 h-16 lg:w-[25vw] lg:h-[25vw] lg:max-w-[320px] lg:max-h-[320px] z-0"
+          className="absolute left-[10%] top-[25%] w-20 h-20 sm:w-28 sm:h-28 lg:w-[30vw] lg:h-[30vw] lg:max-w-[400px] lg:max-h-[400px] z-0"
         >
-          <div className="w-full h-full blur-[40px] lg:blur-[70px] opacity-50">
+          <div className="w-full h-full blur-[40px] sm:blur-[50px] lg:blur-[80px] opacity-50">
             <AnimatedSphere />
           </div>
         </motion.div>
