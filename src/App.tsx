@@ -779,17 +779,18 @@ return (
                 ))}
               </ul>
 
-              <button className={`
-                w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300
-                ${protocol.popular
-                  ? 'bg-egyptian-blue text-black hover:bg-opacity-90'
-                  : 'bg-white/5 text-black border border-black/10 hover:bg-white/10'
-                }
-              `}
-                onClick={() => protocol.id === 4 && (window.location.href = 'mailto:enigmolabs@gmail.com?subject=Project Inquiry: Custom')}
-              >
-                {protocol.cta}
-              </button>
+<button
+                 onClick={() => smoothScrollTo('contact')}
+                 className={`
+                 w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300
+                 ${protocol.popular
+                   ? 'bg-egyptian-blue text-black hover:bg-opacity-90'
+                   : 'bg-white/5 text-black border border-black/10 hover:bg-white/10'
+                 }
+               `}
+               >
+                 {protocol.cta}
+               </button>
             </motion.div>
           ))}
         </div>
