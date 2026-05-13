@@ -330,93 +330,108 @@ const AnimatedSphere = () => {
 }
 
 const GlobalHero = () => {
-  const terms = ["Intelligence", "Websites", "Systems", "Agents", "Automation"];
-  const [currentTerm, setCurrentTerm] = useState(0);
+   const terms = ["Intelligence", "Websites", "Systems", "Agents", "Automation"];
+   const [currentTerm, setCurrentTerm] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTerm((prev) => (prev + 1) % terms.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [terms.length]);
+   useEffect(() => {
+     const interval = setInterval(() => {
+       setCurrentTerm((prev) => (prev + 1) % terms.length);
+     }, 3000);
+     return () => clearInterval(interval);
+   }, [terms.length]);
 
-  return (
-    <section id="hero" className="min-h-screen relative overflow-hidden bg-white">
-      {/* Sphere Background */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="absolute left-2/5 top-0 w-3/5 h-full z-0"
-      >
-        <AnimatedSphere />
-      </motion.div>
+   return (
+     <section id="hero" className="relative min-h-screen overflow-hidden bg-white">
+       {/* Background gradient overlay for depth */}
+       <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100" />
 
-      {/* Left Text Overlay */}
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 p-8 z-10"
-      >
-        <div className="space-y-8">
-          <motion.div
-            className="inline-flex items-center px-4 py-2 bg-egyptian-blue/10 border border-egyptian-blue/20 rounded-full text-sm font-medium text-egyptian-blue backdrop-blur-sm"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <span className="w-2 h-2 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
-            Based in Nairobi, Kenya
-          </motion.div>
+       {/* Large decorative sphere — bleeds beyond container for overlay effect */}
+       <motion.div
+         initial={{ opacity: 0, scale: 0.6 }}
+         animate={{ opacity: 1, scale: 1 }}
+         transition={{ duration: 1, delay: 0.3 }}
+         className="absolute -right-[10%] top-[-5%] w-[85vw] h-[85vw] max-w-[900px] max-h-[900px] z-0 overflow-visible"
+       >
+         <AnimatedSphere />
+       </motion.div>
 
-          <div className="space-y-6">
-            <motion.h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-black"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              Deciphering Complexity.<br />
-              Engineering{" "}
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={terms[currentTerm]}
-                  initial={{ y: 20, opacity: 0, filter: "blur(4px)" }}
-                  animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-                  exit={{ y: -20, opacity: 0, filter: "blur(4px)" }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="text-egyptian-blue"
-                >
-                  {terms[currentTerm]}
-                </motion.span>
-              </AnimatePresence>
-            </motion.h1>
+       {/* Subtle background glow behind sphere */}
+       <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 0.4 }}
+         transition={{ duration: 1.5, delay: 0.5 }}
+         className="absolute right-0 top-0 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[120px] bg-egyptian-blue/20 z-[1]"
+       />
 
-            <motion.p
-              className="text-lg text-gray-700 leading-relaxed max-w-xl"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              Welcome to Enigmo Labs. We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
-            </motion.p>
-          </div>
-
-           <motion.button
-             onClick={() => smoothScrollTo('contact')}
-             className="px-8 py-4 bg-egyptian-blue text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl hover-glow"
-             initial={{ opacity: 0, y: 20 }}
+       {/* Left Text Content — always on top */}
+       <div className="relative z-10 flex items-center min-h-screen px-4 sm:px-8 lg:px-16">
+         <div className="max-w-2xl">
+           <motion.div
+             initial={{ opacity: 0, y: 30 }}
              animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8, delay: 0.8 }}
+             transition={{ duration: 0.8, delay: 0.1 }}
+             className="mb-6"
            >
-             Initialize Project
-           </motion.button>
-        </div>
-      </motion.div>
-    </section>
-  )
-}
+             <span className="inline-flex items-center px-3 py-1.5 bg-egyptian-blue/10 border border-egyptian-blue/20 rounded-full text-xs font-mono text-egyptian-blue tracking-wider uppercase">
+               <span className="w-1.5 h-1.5 bg-egyptian-blue rounded-full mr-2 animate-pulse"></span>
+               Based in Nairobi, Kenya
+             </span>
+           </motion.div>
+
+           <motion.h1
+             className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] text-black mb-6"
+             initial={{ opacity: 0, y: 30 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.9, delay: 0.25 }}
+           >
+             Deciphering Complexity.
+             <br />
+             <span className="relative">
+               Engineering{" "}
+               <AnimatePresence mode="wait">
+                 <motion.span
+                   key={terms[currentTerm]}
+                   initial={{ y: 25, opacity: 0, filter: "blur(6px)" }}
+                   animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                   exit={{ y: -25, opacity: 0, filter: "blur(6px)" }}
+                   transition={{ duration: 0.55, ease: "easeInOut" }}
+                   className="text-egyptian-blue inline-block"
+                 >
+                   {terms[currentTerm]}
+                 </motion.span>
+               </AnimatePresence>
+             </span>
+           </motion.h1>
+
+           <motion.p
+             className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl mb-10"
+             initial={{ opacity: 0, y: 25 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.9, delay: 0.45 }}
+           >
+             Welcome to Enigmo Labs. We transform fragmented data into elegant, high-performance systems through Web Engineering, Management Systems, AI Agents, and Automation.
+           </motion.p>
+
+           <motion.div
+             initial={{ opacity: 0, y: 25 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.9, delay: 0.65 }}
+           >
+             <button
+               onClick={() => smoothScrollTo('contact')}
+               className="group relative inline-flex items-center gap-2 px-8 py-4 bg-egyptian-blue text-black font-semibold rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden"
+             >
+               <span className="relative z-10">Initialize Project</span>
+               <span className="relative z-10 w-5 h-5 rounded-full border-2 border-black/30 flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300">
+                 →
+               </span>
+             </button>
+           </motion.div>
+         </div>
+       </div>
+     </section>
+   )
+ }
 
 // The Enigmo Protocol Section
 const EnigmoProtocol = () => {
