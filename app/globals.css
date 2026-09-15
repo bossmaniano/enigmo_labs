@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Geist', 'Inter', 'system-ui', 'sans-serif';
+    --font-mono: '"Space Mono"', 'monospace';
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-midnight text-gray-100 font-sans antialiased;
+  }
+
+  /* Dark theme scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0d12;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1a2a5c;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-border {
+    @apply border border-white/10;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+
+  .hover-glow:hover {
+    @apply transform;
+    box-shadow: 0 0 30px 6px rgba(16, 52, 166, 0.25);
+  }
+}
