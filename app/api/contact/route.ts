@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
@@ -12,33 +14,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
-    const fromEmail = process.env.FROM_EMAIL || smtpUser;
     const toEmail = process.env.TO_EMAIL || 'enigmolabs@gmail.com';
 
-    if (!smtpHost || !smtpUser || !smtpPass) {
-      console.error('SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables.');
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY not configured.');
       return NextResponse.json(
-        { error: 'Email service not configured. Please contact us directly at enigmolabs@gmail.com.' },
+        { error: 'Email service not configured.' },
         { status: 503 },
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpPort === 465,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    });
-
-    const mailOptions = {
-      from: fromEmail,
+    const { error } = await resend.emails.send({
+      from: 'onboarding@resend.dev',
       to: toEmail,
       subject: `New Contact Form Submission: ${protocol || 'General Inquiry'}`,
       text: `
@@ -92,9 +79,15 @@ ${brief}
 </body>
 </html>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
+    if (error) {
+      console.error('Resend error:', error);
+      return NextResponse.json(
+        { error: 'Failed to send message. Please retry or contact enigmolabs@gmail.com directly.' },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json(
       { success: true, message: 'Message received successfully.' },
