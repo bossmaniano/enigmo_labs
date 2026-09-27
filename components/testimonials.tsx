@@ -29,23 +29,27 @@ export const Testimonials: FC = () => {
       className="py-24 px-4 sm:px-6 lg:px-8 bg-midnight overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-3 relative z-10"
-        >
-          <span className="px-3 py-1 text-xs font-semibold tracking-widest text-sky-400 uppercase rounded-full bg-sky-500/10 border border-sky-500/20 inline-block">
+        {/* Section Header with Sticky/Solid Background */}
+        <div className="sticky top-16 z-20 bg-slate-950/95 backdrop-blur-md py-6 border-b border-slate-800/50 text-center max-w-4xl mx-auto mb-10">
+          <span className="px-3 py-1 text-xs font-semibold tracking-widest text-sky-400 uppercase rounded-full bg-sky-500/10 border border-sky-500/20 inline-block mb-2">
             Social Proof
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Aligned <span className="text-sky-400">Testimonials</span>
           </h2>
-          <p className="mt-4 text-gray-300 text-lg max-w-3xl mx-auto">
-            Real results from organizations transforming their operations with
-            our engineering expertise.
+          <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto mt-2">
+            Real results from organizations transforming their operations with our engineering expertise.
           </p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="mb-8"
+        >
+          <div className="h-16" /> {/* Spacer for sticky header */}
         </motion.div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 relative z-0">
