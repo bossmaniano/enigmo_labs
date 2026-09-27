@@ -34,15 +34,13 @@ export const Testimonials: FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-3 relative z-10"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-egyptian-blue/30 bg-egyptian-blue/10 px-4 py-2 mb-6">
-            <span className="text-xs font-mono text-egyptian-blue uppercase tracking-wider">
-              Social Proof
-            </span>
-          </div>
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            Aligned <span className="text-egyptian-blue">Testimonials</span>
+          <span className="px-3 py-1 text-xs font-semibold tracking-widest text-sky-400 uppercase rounded-full bg-sky-500/10 border border-sky-500/20 inline-block">
+            Social Proof
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Aligned <span className="text-sky-400">Testimonials</span>
           </h2>
           <p className="mt-4 text-gray-300 text-lg max-w-3xl mx-auto">
             Real results from organizations transforming their operations with
@@ -50,7 +48,7 @@ export const Testimonials: FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 relative z-0">
           {columns.map((column, columnIndex) => {
             const set = [...column, ...column];
             return (
@@ -68,20 +66,20 @@ export const Testimonials: FC = () => {
                   {set.map((t, i) => (
                     <motion.div
                       key={`${t.id}-${i}`}
-                      className="rounded-xl border border-white/10 bg-charcoal-light p-7 flex flex-col justify-between cursor-pointer transition-colors hover:border-egyptian-blue/40"
+className="rounded-xl border border-white/10 bg-charcoal-light p-7 flex flex-col justify-between cursor-pointer transition-colors hover:border-sky-500/40 min-h-[200px]"
                       whileHover={{
                         scale: 1.02,
-                        boxShadow: '0 0 32px rgba(16,52,166,0.3)',
+                        boxShadow: '0 0 32px rgba(14, 165, 233, 0.3)',
                       }}
                     >
-                      <blockquote className="text-gray-200 text-lg leading-relaxed mb-5 flex-1">
-                        “{t.quote}”
+                      <blockquote className="text-gray-200 text-base leading-relaxed mb-5 flex-1 overflow-hidden">
+                        &ldquo;{t.quote}&rdquo;
                       </blockquote>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 mt-auto">
                         <cite className="font-bold text-white not-italic">
                           {t.author}
                         </cite>
-                        <span className="text-sm text-egyptian-blue font-mono">
+                        <span className="text-sm text-sky-400 font-mono">
                           {t.company}
                         </span>
                       </div>
