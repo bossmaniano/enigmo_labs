@@ -40,7 +40,7 @@ export const Protocol: FC = () => (
               viewport={{ once: true }}
               className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 gap-4 transition-all hover:border-sky-500/40"
             >
-              {/* Text Container */}
+              {/* Text Content */}
               <div className="flex-1 space-y-1 text-left">
                 <h3 className="text-xl font-bold text-white tracking-tight">
                   {step.title}
@@ -50,9 +50,9 @@ export const Protocol: FC = () => (
                 </p>
               </div>
 
-              {/* Icon Container (Flex-shrink-0 prevents icon collapsing/distorting) */}
+              {/* Clean Icon (No Background Box Enclosure) */}
               <motion.div
-                className="flex-shrink-0 flex items-center justify-start sm:justify-center w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20"
+                className="flex-shrink-0 flex items-center justify-center text-sky-400"
                 animate={
                   step.title === 'Analyze'
                     ? { rotate: 360 }
@@ -78,7 +78,7 @@ export const Protocol: FC = () => (
                       : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }
                 }
               >
-                <step.icon className="w-6 h-6" />
+                <step.icon className="w-8 h-8 stroke-[1.75]" />
               </motion.div>
             </motion.div>
           );
