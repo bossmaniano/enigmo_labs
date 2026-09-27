@@ -121,13 +121,15 @@ Nairobi, Kenya
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: monospace; background: #0a0a0a; color: #e4e4e7; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 24px; }
-    .header { color: #0ea5e9; font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 16px; }
-    .content { line-height: 1.6; }
-    .detail { background: #09090b; border: 1px solid #27272a; border-radius: 6px; padding: 16px; margin: 16px 0; white-space: pre-wrap; }
-    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #27272a; color: #0ea5e9; font-size: 12px; }
-    .accent { color: #0ea5e9; }
+    body { font-family: monospace; background: #0a0a0a; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 24px; color: #38bdf8; }
+    .container * { color: #38bdf8 !important; }
+    .header { font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
+    .content { line-height: 1.8; }
+    .detail { background: #0c1a2b; border: 1px solid #1e293b; border-radius: 6px; padding: 16px; margin: 16px 0; white-space: pre-wrap; }
+    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #1e293b; font-size: 12px; }
+    strong { font-weight: 700; }
+    p { margin: 12px 0; }
   </style>
 </head>
 <body>
@@ -135,16 +137,16 @@ Nairobi, Kenya
     <div class="header">> MESSAGE RECEIVED</div>
     <div class="content">
       <p>Hi ${name},</p>
-      <p>Thank you for reaching out to <strong class="accent">Enigmo Labs</strong>. We've received your message and will get back to you within <strong class="accent">12 business hours</strong>.</p>
+      <p>Thank you for reaching out to <strong>Enigmo Labs</strong>. We have received your message and will get back to you within <strong>12 business hours</strong>.</p>
       <div class="detail">
-<strong class="accent">Your submission details:</strong>
+<strong>Your submission details:</strong>
 - Protocol: ${protocol || 'Not specified'}
 - Phone: ${phone || 'Not provided'}
 
-<strong class="accent">Your message:</strong>
+<strong>Your message:</strong>
 ${brief}
       </div>
-      <p>Best regards,<br><strong class="accent">Enigmo Labs Team</strong></p>
+      <p>Best regards,<br><strong>Enigmo Labs Team</strong></p>
     </div>
     <div class="footer">
       enigmolabs@gmail.com | +254 768 810 657 | Nairobi, Kenya
