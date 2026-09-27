@@ -34,7 +34,8 @@ export async function POST(request: Request) {
       },
     });
 
-    const mailOptions = {
+    // Email to Enigmo Labs
+    const adminMailOptions = {
       from: smtpUser,
       to: toEmail,
       subject: `New Contact Form Submission from ${name}`,
@@ -91,7 +92,72 @@ ${brief}
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    // Confirmation email to sender
+    const senderMailOptions = {
+      from: smtpUser,
+      to: email,
+      subject: 'We received your message — Enigmo Labs',
+      text: `
+Hi ${name},
+
+Thank you for reaching out to Enigmo Labs. We've received your message and will get back to you within 12 business hours.
+
+Your submission details:
+- Protocol: ${protocol || 'Not specified'}
+- Phone: ${phone || 'Not provided'}
+
+Your message:
+${brief}
+
+Best regards,
+Enigmo Labs Team
+enigmolabs@gmail.com
++254 768 810 657
+Nairobi, Kenya
+      `,
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: monospace; background: #0a0a0a; color: #e4e4e7; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 24px; }
+    .header { color: #0ea5e9; font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 16px; }
+    .content { line-height: 1.6; }
+    .detail { background: #09090b; border: 1px solid #27272a; border-radius: 6px; padding: 16px; margin: 16px 0; white-space: pre-wrap; }
+    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #27272a; color: #71717a; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">> MESSAGE RECEIVED</div>
+    <div class="content">
+      <p>Hi ${name},</p>
+      <p>Thank you for reaching out to <strong>Enigmo Labs</strong>. We've received your message and will get back to you within <strong>12 business hours</strong>.</p>
+      <div class="detail">
+<strong>Your submission details:</strong>
+- Protocol: ${protocol || 'Not specified'}
+- Phone: ${phone || 'Not provided'}
+
+<strong>Your message:</strong>
+${brief}
+      </div>
+      <p>Best regards,<br>Enigmo Labs Team</p>
+    </div>
+    <div class="footer">
+      enigmolabs@gmail.com | +254 768 810 657 | Nairobi, Kenya
+    </div>
+  </div>
+</body>
+</html>
+      `,
+    };
+
+    await Promise.all([
+      transporter.sendMail(adminMailOptions),
+      transporter.sendMail(senderMailOptions),
+    ]);
 
     return NextResponse.json(
       { success: true, message: 'Message received successfully.' },
