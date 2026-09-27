@@ -55,7 +55,7 @@ export const Testimonials: FC = () => {
               <div
                 key={columnIndex}
                 data-marquee-column
-                className="relative h-[700px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
+                className="relative h-[700px] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_85%,transparent_100%)]"
                 style={{
                   animation: 'marquee 40s linear infinite',
                 }}
