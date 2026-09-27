@@ -58,7 +58,7 @@ ${brief}
     .container { max-width: 600px; margin: 0 auto; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 24px; }
     .header { color: #0ea5e9; font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 16px; }
     .field { margin-bottom: 16px; }
-    .label { color: #71717a; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .label { color: #0ea5e9; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
     .value { color: #fafafa; font-size: 14px; }
     .brief { background: #09090b; border: 1px solid #27272a; border-radius: 6px; padding: 16px; white-space: pre-wrap; }
   </style>
@@ -126,7 +126,8 @@ Nairobi, Kenya
     .header { color: #0ea5e9; font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 16px; }
     .content { line-height: 1.6; }
     .detail { background: #09090b; border: 1px solid #27272a; border-radius: 6px; padding: 16px; margin: 16px 0; white-space: pre-wrap; }
-    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #27272a; color: #71717a; font-size: 12px; }
+    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #27272a; color: #0ea5e9; font-size: 12px; }
+    .accent { color: #0ea5e9; }
   </style>
 </head>
 <body>
@@ -134,16 +135,16 @@ Nairobi, Kenya
     <div class="header">> MESSAGE RECEIVED</div>
     <div class="content">
       <p>Hi ${name},</p>
-      <p>Thank you for reaching out to <strong>Enigmo Labs</strong>. We've received your message and will get back to you within <strong>12 business hours</strong>.</p>
+      <p>Thank you for reaching out to <strong class="accent">Enigmo Labs</strong>. We've received your message and will get back to you within <strong class="accent">12 business hours</strong>.</p>
       <div class="detail">
-<strong>Your submission details:</strong>
+<strong class="accent">Your submission details:</strong>
 - Protocol: ${protocol || 'Not specified'}
 - Phone: ${phone || 'Not provided'}
 
-<strong>Your message:</strong>
+<strong class="accent">Your message:</strong>
 ${brief}
       </div>
-      <p>Best regards,<br>Enigmo Labs Team</p>
+      <p>Best regards,<br><strong class="accent">Enigmo Labs Team</strong></p>
     </div>
     <div class="footer">
       enigmolabs@gmail.com | +254 768 810 657 | Nairobi, Kenya
