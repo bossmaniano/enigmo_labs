@@ -1,13 +1,21 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, TikTok } from '@/components/ui/social-icons';
 import { CONTACT_INFO, NAV_ITEMS } from '@/lib/data';
+
+const SOCIAL_LINKS = [
+  { name: 'Instagram', href: 'https://www.instagram.com/enigmolabs?utm_source=qr&stkn=MTJ3eGJrYTh5eDMyMA==', icon: Instagram },
+  { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61594576552869', icon: Facebook },
+  { name: 'TikTok', href: 'https://www.tiktok.com/@enigmo_labs?_r=1&_t=ZS-9A5C2NCVFcl', icon: TikTok },
+  { name: 'LinkedIn', href: 'https://www.linkedin.com/in/enigmo-labs-a85286437/', icon: Linkedin },
+] as const;
 
 export const Footer = () => (
   <footer className="bg-charcoal border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8">
     <div className="max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
-        <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-5">
+        <div className="space-y-4 md:col-span-2">
           <div className="flex items-center gap-3">
             <Image
               src="/enigmolabs.jpeg"
@@ -23,6 +31,20 @@ export const Footer = () => (
           <p className="text-sm text-gray-400">
             Engineering Intelligence from Nairobi.
           </p>
+          <div className="flex items-center gap-4 pt-4 border-t border-white/5">
+            {SOCIAL_LINKS.map((social) => (
+              <a
+                key={social.name}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-400 hover:text-egyptian-blue transition-colors"
+                aria-label={social.name}
+              >
+                <social.icon className="h-5 w-5" />
+              </a>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-3">
