@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer from 'nodemailer';
 
 export async function POST(request: Request) {
   try {
@@ -14,27 +12,39 @@ export async function POST(request: Request) {
       );
     }
 
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
     const toEmail = process.env.TO_EMAIL || 'enigmolabs@gmail.com';
 
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY not configured.');
+    if (!smtpUser || !smtpPass) {
+      console.error('Gmail SMTP credentials not configured. Set SMTP_USER and SMTP_PASS.');
       return NextResponse.json(
         { error: 'Email service not configured.' },
         { status: 503 },
       );
     }
 
-    const { error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    });
+
+    const mailOptions = {
+      from: smtpUser,
       to: toEmail,
-      subject: `New Contact Form Submission: ${protocol || 'General Inquiry'}`,
+      subject: `New Contact Form Submission from ${name}`,
       text: `
 Name: ${name}
 Email: ${email}
 Phone: ${phone || 'Not provided'}
 Protocol: ${protocol || 'Not specified'}
 
-Brief:
+Message:
 ${brief}
       `,
       html: `
@@ -56,10 +66,6 @@ ${brief}
   <div class="container">
     <div class="header">> NEW CONTACT SUBMISSION</div>
     <div class="field">
-      <div class="label">Protocol</div>
-      <div class="value">${protocol || 'Not specified'}</div>
-    </div>
-    <div class="field">
       <div class="label">Name</div>
       <div class="value">${name}</div>
     </div>
@@ -72,22 +78,20 @@ ${brief}
       <div class="value">${phone || 'Not provided'}</div>
     </div>
     <div class="field">
-      <div class="label">Technical Brief</div>
+      <div class="label">Protocol</div>
+      <div class="value">${protocol || 'Not specified'}</div>
+    </div>
+    <div class="field">
+      <div class="label">Message</div>
       <div class="value brief">${brief}</div>
     </div>
   </div>
 </body>
 </html>
       `,
-    });
+    };
 
-    if (error) {
-      console.error('Resend error:', error);
-      return NextResponse.json(
-        { error: 'Failed to send message. Please retry or contact enigmolabs@gmail.com directly.' },
-        { status: 500 },
-      );
-    }
+    await transporter.sendMail(mailOptions);
 
     return NextResponse.json(
       { success: true, message: 'Message received successfully.' },
