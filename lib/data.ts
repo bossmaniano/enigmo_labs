@@ -14,6 +14,7 @@ import type {
   Capability,
   ProtocolStep,
   PricingTier,
+  SmeProgramTerm,
   Testimonial,
   PortfolioItem,
   NavItem,
@@ -87,15 +88,20 @@ export const PRICING_TIERS: readonly PricingTier[] = [
     title: 'Foundations',
     category: 'Web',
     subtitle: 'High-Performance Web Engineering.',
-    price: 'KSh 35,000',
+    price: 'KSh 0 Engineering Labor',
+    priceWas: 'KSh 35,000',
+    priceNote: '+ KSh 6,000 mandatory 1-Yr Infrastructure Setup Fee',
+    badge: '🔥 12 SPONSORED SLOTS OPEN',
+    featured: true,
     icon: Globe,
     features: [
       'Custom UI/UX Design',
       'SEO & Global Edge Hosting',
-      '1-Year Free Domain & SSL',
-      'Speed Optimization',
+      '1-Yr .co.ke Domain, SSL & DNS Setup',
+      '7-Day Build SLA After Asset Delivery',
     ],
-    cta: 'Initialize Web Project',
+    cta: 'Apply for Sponsored Slot',
+    ctaHref: '/apply',
   },
   {
     id: 'intelligence',
@@ -316,6 +322,43 @@ export const CONTACT_INFO = {
   phone: '+254 768 810 657',
   location: 'Nairobi, Kenya',
 } as const;
+
+export const SME_PROGRAM = {
+  name: 'Q4 2026 SME Digital Acceleration Program',
+  sponsoredSlots: 12,
+  standardEngineeringFee: 'KSh 35,000',
+  sponsoredEngineeringFee: 'KSh 0 Engineering Labor',
+  setupFee: 'KSh 6,000',
+  buildSlaDays: 7,
+  responseSlaHours: 24,
+  intakeHref: '/apply',
+  successMessage:
+    'Application Received! Our founding team will review your application and reach out via WhatsApp within 24 hours.',
+} as const;
+
+export const ANNOUNCEMENT_TEXT = `⚡ ${SME_PROGRAM.name}: ${SME_PROGRAM.standardEngineeringFee} Engineering Fee Waived for ${SME_PROGRAM.sponsoredSlots} Selected Kenyan Businesses.` as const;
+
+/** Every entry must be accepted before an application can be transmitted. */
+export const SME_TERMS: readonly SmeProgramTerm[] = [
+  {
+    id: 'setupFee',
+    label: `I agree to pay the mandatory ${SME_PROGRAM.setupFee} setup fee (.co.ke domain, 1-year hosting, SSL, and DNS setup) upon selection.`,
+  },
+  {
+    id: 'assetDelivery',
+    label: 'I commit to providing high-resolution logos, text copy, and product/service images within 7 business days.',
+  },
+  {
+    id: 'testimonial',
+    label: 'I agree to provide a short video or written testimonial after site launch to support Enigmo Labs research.',
+  },
+];
+
+export const SME_INTAKE_STEPS: readonly string[] = [
+  'Submit the intake form — no payment is taken now.',
+  `We review qualification and reply via WhatsApp within ${SME_PROGRAM.responseSlaHours} hours.`,
+  `On selection, the ${SME_PROGRAM.setupFee} setup fee is invoiced and the build clock starts once your assets arrive.`,
+] as const;
 
 export const TERMINAL_LINES: readonly string[] = [
   '[SYSTEM]: PACKET ENCRYPTED AND DISPATCHED.',

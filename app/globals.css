@@ -12,7 +12,8 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    /* 36px announcement bar + 64px navbar + breathing room */
+    scroll-padding-top: 6.5rem;
   }
 
   body {

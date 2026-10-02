@@ -1,4 +1,10 @@
-import type { ContactFormData, ContactField } from './types';
+import type {
+  ContactFormData,
+  ContactField,
+  SmeApplication,
+  SmeApplicationField,
+  SmeTermKey,
+} from './types';
 
 export const classNames = (...classes: (string | false | undefined)[]) =>
   classes.filter(Boolean).join(' ');
@@ -53,3 +59,55 @@ export const splitIntoColumns = <T>(items: readonly T[], columns: number): T[][]
     acc[col].push(item);
     return acc;
   }, Array.from({ length: columns }, () => []));
+
+const URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i;
+
+export const allTermsAccepted = (
+  terms: SmeApplication['terms'],
+): boolean => Object.values(terms).every(Boolean);
+
+export interface SmeValidationResult {
+  readonly valid: boolean;
+  readonly errors: Partial<Record<SmeApplicationField, string>>;
+  readonly missingTerms: readonly SmeTermKey[];
+}
+
+/**
+ * Mirrors the server-side guard in `app/api/apply/route.ts` so the applicant is
+ * never told an application is valid only to be rejected by the API.
+ */
+export const validateSmeApplication = (
+  data: SmeApplication,
+): SmeValidationResult => {
+  const errors: Partial<Record<SmeApplicationField, string>> = {};
+
+  if (data.businessName.trim().length < 2) {
+    errors.businessName = 'Business name is required.';
+  }
+  if (data.industry.trim().length < 2) {
+    errors.industry = 'Industry or niche is required.';
+  }
+  if (data.contactPerson.trim().length < 2) {
+    errors.contactPerson = 'Contact person name is required.';
+  }
+
+  const digits = data.whatsapp.replace(/\D/g, '');
+  if (digits.length < 9 || digits.length > 15) {
+    errors.whatsapp = 'Enter a valid WhatsApp number (e.g. +254 768 810 657).';
+  }
+
+  const socialLink = data.socialLink.trim();
+  if (socialLink && !URL_REGEX.test(socialLink)) {
+    errors.socialLink = 'Enter a valid link (e.g. https://facebook.com/yourbiz).';
+  }
+
+  const missingTerms = (Object.keys(data.terms) as SmeTermKey[]).filter(
+    (key) => !data.terms[key],
+  );
+
+  return {
+    valid: Object.keys(errors).length === 0 && missingTerms.length === 0,
+    errors,
+    missingTerms,
+  };
+};

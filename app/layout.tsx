@@ -1,5 +1,6 @@
 import { type Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { AnnouncementBar } from '@/components/announcement-bar';
 import { Navbar } from '@/components/navbar';
 import { ScrollProgress } from '@/components/scroll-progress';
 import '@/app/globals.css';
@@ -71,6 +72,7 @@ export default function RootLayout({
     <html lang="en" className="h-full scroll-smooth">
       <body className="min-h-screen bg-midnight text-gray-100 antialiased">
         <ScrollProgress />
+        <AnnouncementBar />
         <Navbar />
         <main>{children}</main>
       </body>

@@ -26,6 +26,11 @@ export interface PricingTier {
   readonly features: readonly string[];
   readonly cta: string;
   readonly popular?: boolean;
+  readonly featured?: boolean;
+  readonly badge?: string;
+  readonly priceWas?: string;
+  readonly priceNote?: string;
+  readonly ctaHref?: string;
 }
 
 export interface Testimonial {
@@ -61,3 +66,38 @@ export interface ContactFormData {
 }
 
 export type ContactStatus = 'idle' | 'sending' | 'success' | 'error';
+
+export type SmeApplicationField =
+  | 'businessName'
+  | 'industry'
+  | 'contactPerson'
+  | 'whatsapp'
+  | 'socialLink';
+
+export type SmeTermKey = 'setupFee' | 'assetDelivery' | 'testimonial';
+
+export interface SmeProgramTerm {
+  readonly id: SmeTermKey;
+  readonly label: string;
+}
+
+export interface SmeApplicationTerms {
+  setupFee: boolean;
+  assetDelivery: boolean;
+  testimonial: boolean;
+}
+
+export interface SmeApplication {
+  businessName: string;
+  industry: string;
+  contactPerson: string;
+  whatsapp: string;
+  socialLink: string;
+  terms: SmeApplicationTerms;
+}
+
+export type SmeApplicationStatus =
+  | 'idle'
+  | 'submitting'
+  | 'success'
+  | 'error';

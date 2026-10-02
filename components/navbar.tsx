@@ -3,6 +3,7 @@
 import { useEffect, useState, type FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { NAV_ITEMS } from '@/lib/data';
 import { scrollToSection } from '@/lib/utils';
@@ -45,6 +46,8 @@ const useScrollSpy = (
 };
 
 export const Navbar: FC<NavbarProps> = ({ brand }) => {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
   const { active, scrolled } = useScrollSpy([
     'hero',
     'solutions',
@@ -56,9 +59,14 @@ export const Navbar: FC<NavbarProps> = ({ brand }) => {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Hash links are relative to the landing page, so they must be rooted when
+  // rendered from another route (e.g. /apply).
+  const resolveHref = (href: string): string =>
+    isHome || !href.startsWith('#') ? href : `/${href}`;
+
   const handleNavClick = (href: string) => {
     setMenuOpen(false);
-    if (href.startsWith('#')) {
+    if (isHome && href.startsWith('#')) {
       scrollToSection(href);
     }
   };
@@ -66,7 +74,7 @@ export const Navbar: FC<NavbarProps> = ({ brand }) => {
   return (
     <nav
       aria-label="Main navigation"
-      className={`sticky top-0 z-40 backdrop-blur-md transition-all duration-300 ${
+      className={`sticky top-9 z-40 backdrop-blur-md transition-all duration-300 ${
         scrolled ? 'bg-midnight/70 shadow-lg shadow-black/30' : 'bg-transparent'
       } border-b border-white/5`}
     >
@@ -91,11 +99,11 @@ export const Navbar: FC<NavbarProps> = ({ brand }) => {
 
           <div className="hidden md:flex items-center gap-8">
             {NAV_ITEMS.map((item) => {
-              const isActive = active === item.href.slice(1);
+              const isActive = isHome && active === item.href.slice(1);
               return (
                 <Link
                   key={item.label}
-                  href={item.href}
+                  href={resolveHref(item.href)}
                   onClick={() => handleNavClick(item.href)}
                   className={`relative text-sm font-mono tracking-widest uppercase transition-colors ${
                     isActive
@@ -114,14 +122,13 @@ export const Navbar: FC<NavbarProps> = ({ brand }) => {
                 </Link>
               );
             })}
-            <button
-              type="button"
+            <Link
+              href={resolveHref('#contact')}
               onClick={() => handleNavClick('#contact')}
-              className="px-4 py-2 text-sm font-medium text-white border border-white/20 rounded-full hover:bg-egyptian-blue/20 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white border border-white/20 rounded-full hover:bg-egyptian-blue/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-egyptian-blue"
             >
               Consultation
-            </button>
-          </div>
+            </Link>          </div>
 
           <button
             type="button"
@@ -142,11 +149,11 @@ export const Navbar: FC<NavbarProps> = ({ brand }) => {
           >
             <div className="flex flex-col gap-2 py-3">
               {NAV_ITEMS.map((item) => {
-                const isActive = active === item.href.slice(1);
+                const isActive = isHome && active === item.href.slice(1);
                 return (
                   <Link
                     key={item.label}
-                    href={item.href}
+                    href={resolveHref(item.href)}
                     onClick={() => handleNavClick(item.href)}
                     className={`block px-4 py-3 text-sm font-mono tracking-widest uppercase transition-colors ${
                       isActive

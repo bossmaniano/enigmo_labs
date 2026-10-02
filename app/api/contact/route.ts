@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { getMailerConfig, getTransporter } from '@/lib/mailer';
+
+const DEFAULT_TO_EMAIL = 'enigmolabs@gmail.com';
 
 export async function POST(request: Request) {
   try {
@@ -13,26 +15,17 @@ export async function POST(request: Request) {
     }
 
     const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
-    const toEmail = process.env.TO_EMAIL || 'enigmolabs@gmail.com';
+    const config = getMailerConfig();
+    const toEmail = process.env.TO_EMAIL || DEFAULT_TO_EMAIL;
 
-    if (!smtpUser || !smtpPass) {
-      console.error('Gmail SMTP credentials not configured. Set SMTP_USER and SMTP_PASS.');
+    if (!smtpUser || !config) {
       return NextResponse.json(
         { error: 'Email service not configured.' },
         { status: 503 },
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    });
+    const transporter = getTransporter(config);
 
     // Email to Enigmo Labs
     const adminMailOptions = {

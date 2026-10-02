@@ -20,7 +20,9 @@ export const ScrollProgress: FC = () => {
   return (
     <div
       aria-hidden="true"
-      className="fixed top-0 left-0 h-0.5 bg-egyptian-blue origin-left z-50"
+      /* Sits on the navbar's top edge (36px below the viewport top) so it stays
+         legible against the announcement bar rather than blending into it. */
+      className="fixed top-9 left-0 h-0.5 bg-egyptian-blue-light origin-left z-[60]"
       style={{ width: `${offset}%` }}
     />
   );
