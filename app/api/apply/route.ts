@@ -6,12 +6,18 @@ import {
   getMailerConfigs,
   sendMail,
 } from '@/lib/mailer';
-import { SME_PROGRAM, SME_TERMS } from '@/lib/data';
+import { CONTACT_INFO, SME_PROGRAM, SME_TERMS } from '@/lib/data';
 
 export const runtime = 'nodejs';
 
-/** Agency inbox for program applications; override with APPLY_TO_EMAIL. */
-const DEFAULT_ADMIN_EMAILS = 'info@enigmolabs.co.ke, admin@enigmolabs.co.ke';
+/**
+ * Defaults to the agency's published Gmail mailbox, which is a deliverable
+ * address. `info@` / `admin@enigmolabs.co.ke` are only reachable once the
+ * domain publishes MX records — it currently publishes none, so senders
+ * accept the message and it then bounces undelivered. Override with
+ * APPLY_TO_EMAIL once domain mail routing is configured.
+ */
+const DEFAULT_APPLICATION_INBOX = CONTACT_INFO.email;
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
@@ -236,7 +242,7 @@ export async function POST(request: Request) {
     const mail = buildApplicationEmail(application, timestamp);
 
     await sendMail({
-      to: (process.env.APPLY_TO_EMAIL || DEFAULT_ADMIN_EMAILS)
+      to: (process.env.APPLY_TO_EMAIL || DEFAULT_APPLICATION_INBOX)
         .split(',')
         .map((address) => address.trim())
         .filter(Boolean),
