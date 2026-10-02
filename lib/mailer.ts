@@ -54,32 +54,40 @@ const DEFAULT_SMTP_PORT = 465;
 const DEFAULT_RESEND_FROM = 'Enigmo Labs Intake <onboarding@resend.dev>';
 
 /**
- * Resend is preferred when available: it only needs an API key and is not
- * subject to Gmail rejecting logins from datacenter IPs. SMTP (Gmail) remains
- * the fallback so the existing configuration keeps working.
+ * Every provider present in the environment, in preference order: Resend
+ * first (no datacenter-IP login blocks), then Gmail SMTP.
+ *
+ * Both are returned rather than picking a single winner, because a stale or
+ * placeholder RESEND_API_KEY would otherwise shadow a working SMTP setup and
+ * silently route around it.
  */
-export const getMailerConfig = (): MailerConfig | null => {
+export const getMailerConfigs = (): readonly MailerConfig[] => {
+  const configs: MailerConfig[] = [];
+
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
-    return {
+    configs.push({
       provider: 'resend',
       from: process.env.RESEND_FROM || DEFAULT_RESEND_FROM,
-    };
+    });
   }
 
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  if (!user || !pass) {
-    return null;
+  if (user && pass) {
+    configs.push({
+      provider: 'smtp',
+      from: `"Enigmo Labs Intake" <${user}>`,
+      user,
+      pass,
+    });
   }
 
-  return {
-    provider: 'smtp',
-    from: `"Enigmo Labs Intake" <${user}>`,
-    user,
-    pass,
-  };
+  return configs;
 };
+
+export const getMailerConfig = (): MailerConfig | null =>
+  getMailerConfigs()[0] ?? null;
 
 let transporter: Transporter | null = null;
 let resend: Resend | null = null;
@@ -100,10 +108,10 @@ const getTransporter = (config: MailerConfig): Transporter => {
   return transporter;
 };
 
-export const sendMail = async (mail: OutboundMail): Promise<void> => {
-  const config = getMailerConfig();
-  if (!config) throw new MailerNotConfiguredError();
-
+const deliver = async (
+  config: MailerConfig,
+  mail: OutboundMail,
+): Promise<void> => {
   if (config.provider === 'resend') {
     resend ??= new Resend(process.env.RESEND_API_KEY as string);
     const { error } = await resend.emails.send({
@@ -128,6 +136,34 @@ export const sendMail = async (mail: OutboundMail): Promise<void> => {
     text: mail.text,
     html: mail.html,
   });
+};
+
+/**
+ * Tries each configured provider in order so one bad credential cannot
+ * disable an otherwise working mail setup. The last failure is rethrown to
+ * keep the diagnostic detail for the caller.
+ */
+export const sendMail = async (mail: OutboundMail): Promise<void> => {
+  const configs = getMailerConfigs();
+  if (configs.length === 0) throw new MailerNotConfiguredError();
+
+  let lastError: unknown;
+
+  for (const config of configs) {
+    try {
+      await deliver(config, mail);
+      return;
+    } catch (error) {
+      lastError = error;
+      console.error(
+        `[mailer] provider=${config.provider} failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+
+  throw lastError;
 };
 
 export const escapeHtml = (value: string): string =>

@@ -3,6 +3,7 @@ import type { SmeApplication, SmeTermKey } from '@/lib/types';
 import {
   MailerNotConfiguredError,
   escapeHtml,
+  getMailerConfigs,
   sendMail,
 } from '@/lib/mailer';
 import { SME_PROGRAM, SME_TERMS } from '@/lib/data';
@@ -51,11 +52,15 @@ interface SmtpFailure {
  * object.
  */
 const logSendFailure = (error: unknown): void => {
+  const configured = getMailerConfigs()
+    .map((config) => config.provider)
+    .join('+');
+
   if (typeof error === 'object' && error !== null) {
     const { code, command, responseCode, message, resendName, statusCode } =
       error as SmtpFailure;
     console.error(
-      `[api/apply] mail send failed | code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} resendName=${String(resendName)} statusCode=${String(statusCode)} message=${String(message)}`,
+      `[api/apply] mail send failed | configured=${configured || 'none'} code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} resendName=${String(resendName)} statusCode=${String(statusCode)} message=${String(message)}`,
     );
   }
 
