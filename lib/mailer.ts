@@ -29,6 +29,7 @@ let transporter: Transporter | null = null;
 
 const DEFAULT_HOST = 'smtp.gmail.com';
 const DEFAULT_PORT = 465;
+const DEFAULT_SECURE = true;
 
 /**
  * Cached per runtime so we reuse one SMTP pool instead of handshaking per
@@ -39,7 +40,9 @@ export const getTransporter = (config: MailerConfig): Transporter => {
   transporter ??= nodemailer.createTransport({
     host: process.env.SMTP_HOST || DEFAULT_HOST,
     port: Number(process.env.SMTP_PORT) || DEFAULT_PORT,
-    secure: true,
+    secure: process.env.SMTP_SECURE
+      ? process.env.SMTP_SECURE === 'true'
+      : DEFAULT_SECURE,
     auth: { user: config.user, pass: config.pass },
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,

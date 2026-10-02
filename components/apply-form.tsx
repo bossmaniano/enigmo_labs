@@ -56,6 +56,27 @@ const EMPTY_FORM: SmeApplication = {
 const INPUT_CLASSES =
   'w-full rounded-lg border border-white/10 bg-black/60 px-4 py-3 font-mono text-sm text-white placeholder-gray-500 transition-all duration-300 hover:border-white/20 focus:border-egyptian-blue focus:outline-none focus:ring-2 focus:ring-egyptian-blue/40 focus:shadow-[0_0_20px_rgba(16,52,166,0.25)]';
 
+/**
+ * Server failures are surfaced as applicant-safe copy: operational messages
+ * such as "Email service not configured" mean nothing to an applicant and
+ * would read as a broken site.
+ */
+const toApplicantMessage = (status: number, serverMessage?: string): string => {
+  switch (status) {
+    case 429:
+      return serverMessage ?? 'Too many attempts. Please try again in 10 minutes.';
+    case 503:
+      return `Online intake is temporarily unavailable. WhatsApp ${CONTACT_INFO.phone} and we will register you manually.`;
+    case 400:
+      return serverMessage ?? 'Please check the highlighted fields and resubmit.';
+    default:
+      return (
+        serverMessage ??
+        'We could not submit your application. Please retry, or WhatsApp us directly.'
+      );
+  }
+};
+
 interface TextFieldConfig {
   readonly name: SmeApplicationField;
   readonly label: string;
@@ -241,10 +262,7 @@ export const ApplyForm: FC = () => {
         .catch(() => ({}));
 
       if (!response.ok || !data.success) {
-        throw new Error(
-          data.error ??
-            'Transmission failed. Please retry or WhatsApp us directly.',
-        );
+        throw new Error(toApplicantMessage(response.status, data.error));
       }
 
       setStatus('success');
