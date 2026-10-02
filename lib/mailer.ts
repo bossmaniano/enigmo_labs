@@ -28,6 +28,27 @@ export class MailerNotConfiguredError extends Error {
   }
 }
 
+/**
+ * Resend reports the actionable reason in `name` (validation_error,
+ * restriction_reached, ...) plus a status code, so both are preserved for
+ * logs instead of collapsing into a generic failure.
+ */
+export class ResendDeliveryError extends Error {
+  readonly resendName: string;
+  readonly statusCode: number;
+
+  constructor(error: {
+    message?: string | null;
+    name?: string | null;
+    statusCode?: number | null;
+  }) {
+    super(error.message ?? 'Unknown Resend error');
+    this.name = 'ResendDeliveryError';
+    this.resendName = error.name ?? 'unknown';
+    this.statusCode = error.statusCode ?? 0;
+  }
+}
+
 const DEFAULT_SMTP_HOST = 'smtp.gmail.com';
 const DEFAULT_SMTP_PORT = 465;
 const DEFAULT_RESEND_FROM = 'Enigmo Labs Intake <onboarding@resend.dev>';
@@ -94,7 +115,7 @@ export const sendMail = async (mail: OutboundMail): Promise<void> => {
     });
 
     if (error) {
-      throw new Error(`Resend rejected the message: ${error.message}`);
+      throw new ResendDeliveryError(error);
     }
 
     return;

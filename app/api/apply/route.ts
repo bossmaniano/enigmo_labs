@@ -40,18 +40,22 @@ interface SmtpFailure {
   command?: unknown;
   responseCode?: unknown;
   message?: unknown;
+  resendName?: unknown;
+  statusCode?: unknown;
 }
 
 /**
  * Provider failures carry the actionable detail (535 = bad credentials,
- * EAUTH = rejected login, ETIMEDOUT = blocked relay) in discrete fields, so
- * surface them as one greppable line before the full object.
+ * EAUTH = rejected login, restriction_reached = unverified sender) in
+ * discrete fields, so surface them as one greppable line before the full
+ * object.
  */
 const logSendFailure = (error: unknown): void => {
   if (typeof error === 'object' && error !== null) {
-    const { code, command, responseCode, message } = error as SmtpFailure;
+    const { code, command, responseCode, message, resendName, statusCode } =
+      error as SmtpFailure;
     console.error(
-      `[api/apply] mail send failed | code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} message=${String(message)}`,
+      `[api/apply] mail send failed | code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} resendName=${String(resendName)} statusCode=${String(statusCode)} message=${String(message)}`,
     );
   }
 
