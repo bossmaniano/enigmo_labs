@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getMailerConfig, getTransporter } from '@/lib/mailer';
+import { MailerNotConfiguredError, sendMail } from '@/lib/mailer';
 
 const DEFAULT_TO_EMAIL = 'enigmolabs@gmail.com';
 
@@ -14,23 +14,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const smtpUser = process.env.SMTP_USER;
-    const config = getMailerConfig();
     const toEmail = process.env.TO_EMAIL || DEFAULT_TO_EMAIL;
-
-    if (!smtpUser || !config) {
-      return NextResponse.json(
-        { error: 'Email service not configured.' },
-        { status: 503 },
-      );
-    }
-
-    const transporter = getTransporter(config);
 
     // Email to Enigmo Labs
     const adminMailOptions = {
-      from: smtpUser,
-      to: toEmail,
       subject: `New Contact Form Submission from ${name}`,
       text: `
 Name: ${name}
@@ -87,8 +74,6 @@ ${brief}
 
     // Confirmation email to sender
     const senderMailOptions = {
-      from: smtpUser,
-      to: email,
       subject: 'We received your message — Enigmo Labs',
       text: `
 Hi ${name},
@@ -151,8 +136,18 @@ ${brief}
     };
 
     await Promise.all([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(senderMailOptions),
+      sendMail({
+        to: [toEmail],
+        subject: adminMailOptions.subject,
+        text: adminMailOptions.text,
+        html: adminMailOptions.html,
+      }),
+      sendMail({
+        to: [email],
+        subject: senderMailOptions.subject,
+        text: senderMailOptions.text,
+        html: senderMailOptions.html,
+      }),
     ]);
 
     return NextResponse.json(
@@ -160,6 +155,14 @@ ${brief}
       { status: 200 },
     );
   } catch (error) {
+    if (error instanceof MailerNotConfiguredError) {
+      console.error(`[api/contact] ${error.message}`);
+      return NextResponse.json(
+        { error: 'Email service not configured.' },
+        { status: 503 },
+      );
+    }
+
     console.error('Contact form error:', error);
     return NextResponse.json(
       { error: 'Failed to send message. Please retry or contact enigmolabs@gmail.com directly.' },

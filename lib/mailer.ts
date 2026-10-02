@@ -1,55 +1,112 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 export type Transporter = ReturnType<typeof nodemailer.createTransport>;
 
-export interface MailerConfig {
-  readonly user: string;
-  readonly pass: string;
+export interface OutboundMail {
+  readonly to: readonly string[];
+  readonly subject: string;
+  readonly text: string;
+  readonly html: string;
 }
 
+export type MailProvider = 'resend' | 'smtp';
+
+export interface MailerConfig {
+  readonly provider: MailProvider;
+  readonly from: string;
+  readonly user?: string;
+  readonly pass?: string;
+}
+
+export class MailerNotConfiguredError extends Error {
+  constructor() {
+    super(
+      'No mail provider configured. Set RESEND_API_KEY, or SMTP_USER and SMTP_PASS.',
+    );
+    this.name = 'MailerNotConfiguredError';
+  }
+}
+
+const DEFAULT_SMTP_HOST = 'smtp.gmail.com';
+const DEFAULT_SMTP_PORT = 465;
+const DEFAULT_RESEND_FROM = 'Enigmo Labs Intake <onboarding@resend.dev>';
+
 /**
- * SMTP credentials are shared by every transactional route, so a missing
- * configuration is reported once here instead of per route.
+ * Resend is preferred when available: it only needs an API key and is not
+ * subject to Gmail rejecting logins from datacenter IPs. SMTP (Gmail) remains
+ * the fallback so the existing configuration keeps working.
  */
 export const getMailerConfig = (): MailerConfig | null => {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (resendKey) {
+    return {
+      provider: 'resend',
+      from: process.env.RESEND_FROM || DEFAULT_RESEND_FROM,
+    };
+  }
+
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-
   if (!user || !pass) {
-    console.error(
-      'Gmail SMTP credentials not configured. Set SMTP_USER and SMTP_PASS.',
-    );
     return null;
   }
 
-  return { user, pass };
+  return {
+    provider: 'smtp',
+    from: `"Enigmo Labs Intake" <${user}>`,
+    user,
+    pass,
+  };
 };
 
 let transporter: Transporter | null = null;
+let resend: Resend | null = null;
 
-const DEFAULT_HOST = 'smtp.gmail.com';
-const DEFAULT_PORT = 465;
-const DEFAULT_SECURE = true;
-
-/**
- * Cached per runtime so we reuse one SMTP pool instead of handshaking per
- * request. Explicit timeouts guarantee a stalled relay surfaces as an error
- * response instead of holding the request open indefinitely.
- */
-export const getTransporter = (config: MailerConfig): Transporter => {
+const getTransporter = (config: MailerConfig): Transporter => {
   transporter ??= nodemailer.createTransport({
-    host: process.env.SMTP_HOST || DEFAULT_HOST,
-    port: Number(process.env.SMTP_PORT) || DEFAULT_PORT,
+    host: process.env.SMTP_HOST || DEFAULT_SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || DEFAULT_SMTP_PORT,
     secure: process.env.SMTP_SECURE
       ? process.env.SMTP_SECURE === 'true'
-      : DEFAULT_SECURE,
-    auth: { user: config.user, pass: config.pass },
+      : true,
+    auth: { user: config.user as string, pass: config.pass as string },
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,
     socketTimeout: 20_000,
   });
 
   return transporter;
+};
+
+export const sendMail = async (mail: OutboundMail): Promise<void> => {
+  const config = getMailerConfig();
+  if (!config) throw new MailerNotConfiguredError();
+
+  if (config.provider === 'resend') {
+    resend ??= new Resend(process.env.RESEND_API_KEY as string);
+    const { error } = await resend.emails.send({
+      from: config.from,
+      to: [...mail.to],
+      subject: mail.subject,
+      text: mail.text,
+      html: mail.html,
+    });
+
+    if (error) {
+      throw new Error(`Resend rejected the message: ${error.message}`);
+    }
+
+    return;
+  }
+
+  await getTransporter(config).sendMail({
+    from: config.from,
+    to: mail.to.join(', '),
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+  });
 };
 
 export const escapeHtml = (value: string): string =>

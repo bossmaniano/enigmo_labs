@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { SmeApplication, SmeTermKey } from '@/lib/types';
-import { getMailerConfig, getTransporter, escapeHtml } from '@/lib/mailer';
+import {
+  MailerNotConfiguredError,
+  escapeHtml,
+  sendMail,
+} from '@/lib/mailer';
 import { SME_PROGRAM, SME_TERMS } from '@/lib/data';
 
 export const runtime = 'nodejs';
@@ -30,6 +34,29 @@ const isRateLimited = (key: string): boolean => {
 };
 
 class ApplicationValidationError extends Error {}
+
+interface SmtpFailure {
+  code?: unknown;
+  command?: unknown;
+  responseCode?: unknown;
+  message?: unknown;
+}
+
+/**
+ * Provider failures carry the actionable detail (535 = bad credentials,
+ * EAUTH = rejected login, ETIMEDOUT = blocked relay) in discrete fields, so
+ * surface them as one greppable line before the full object.
+ */
+const logSendFailure = (error: unknown): void => {
+  if (typeof error === 'object' && error !== null) {
+    const { code, command, responseCode, message } = error as SmtpFailure;
+    console.error(
+      `[api/apply] mail send failed | code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} message=${String(message)}`,
+    );
+  }
+
+  console.error('[api/apply] full error:', error);
+};
 
 const getClientKey = (request: Request): string =>
   request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
@@ -196,20 +223,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const config = getMailerConfig();
-    if (!config) {
-      return NextResponse.json(
-        { error: 'Email service not configured.' },
-        { status: 503 },
-      );
-    }
-
     const timestamp = formatTimestamp();
     const mail = buildApplicationEmail(application, timestamp);
 
-    await getTransporter(config).sendMail({
-      from: `"Enigmo Labs Intake" <${config.user}>`,
-      to: process.env.APPLY_TO_EMAIL || DEFAULT_ADMIN_EMAILS,
+    await sendMail({
+      to: (process.env.APPLY_TO_EMAIL || DEFAULT_ADMIN_EMAILS)
+        .split(',')
+        .map((address) => address.trim())
+        .filter(Boolean),
       subject: mail.subject,
       text: mail.text,
       html: mail.html,
@@ -221,7 +242,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    console.error('SME application submission error:', error);
+    if (error instanceof MailerNotConfiguredError) {
+      console.error(`[api/apply] ${error.message}`);
+      return NextResponse.json(
+        { error: 'Email service not configured.' },
+        { status: 503 },
+      );
+    }
+
+    logSendFailure(error);
     return NextResponse.json(
       {
         error:
