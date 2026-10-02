@@ -306,7 +306,8 @@ export const ApplyForm: FC = () => {
         Application Received!
       </h2>
       <p className="mx-auto mt-4 max-w-lg text-gray-300">
-        {SME_PROGRAM.successMessage}
+        Our founding team will review your application and reach out via
+        WhatsApp within 24 hours.
       </p>
 
       <div className="mx-auto mt-8 max-w-md space-y-3 text-left">

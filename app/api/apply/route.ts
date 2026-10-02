@@ -251,7 +251,10 @@ export async function POST(request: Request) {
       html: mail.html,
     });
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: SME_PROGRAM.successMessage },
+      { status: 200 },
+    );
   } catch (error) {
     if (error instanceof ApplicationValidationError) {
       return NextResponse.json({ error: error.message }, { status: 400 });
