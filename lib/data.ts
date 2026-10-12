@@ -318,8 +318,8 @@ export const TESTIMONIALS: readonly Testimonial[] = [
 ];
 
 export const CONTACT_INFO = {
-  email: 'enigmolabs@gmail.com',
-  phone: '+254 768 810 657',
+  email: 'info@enigmolabs.co.ke',
+  phone: '+254 710 495 490',
   location: 'Nairobi, Kenya',
 } as const;
 
@@ -362,7 +362,7 @@ export const SME_INTAKE_STEPS: readonly string[] = [
 
 export const TERMINAL_LINES: readonly string[] = [
   '[SYSTEM]: PACKET ENCRYPTED AND DISPATCHED.',
-  '[SYSTEM]: ARCHITECT NOTIFIED (enigmolabs@gmail.com).',
+  '[SYSTEM]: ARCHITECT NOTIFIED (info@enigmolabs.co.ke).',
   '[SYSTEM]: CONFIRMATION SENT TO CLIENT.',
   '[SYSTEM]: STATUS: STANDBY FOR CONTACT WITHIN 12H.',
 ] as const;
