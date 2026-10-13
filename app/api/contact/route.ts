@@ -141,12 +141,14 @@ ${brief}
         subject: adminMailOptions.subject,
         text: adminMailOptions.text,
         html: adminMailOptions.html,
+        replyTo: email,
       }),
       sendMail({
         to: [email],
         subject: senderMailOptions.subject,
         text: senderMailOptions.text,
         html: senderMailOptions.html,
+        replyTo: toEmail,
       }),
     ]);
 

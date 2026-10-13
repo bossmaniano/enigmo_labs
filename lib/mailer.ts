@@ -8,6 +8,7 @@ export interface OutboundMail {
   readonly subject: string;
   readonly text: string;
   readonly html: string;
+  readonly replyTo?: string;
 }
 
 export type MailProvider = 'resend' | 'smtp';
@@ -120,6 +121,7 @@ const deliver = async (
       subject: mail.subject,
       text: mail.text,
       html: mail.html,
+      ...(mail.replyTo ? { replyTo: mail.replyTo } : {}),
     });
 
     if (error) {
@@ -135,6 +137,7 @@ const deliver = async (
     subject: mail.subject,
     text: mail.text,
     html: mail.html,
+    ...(mail.replyTo ? { replyTo: mail.replyTo } : {}),
   });
 };
 
