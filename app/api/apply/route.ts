@@ -209,9 +209,9 @@ const sendEmailViaGmail = async (mailOptions: {
   text: string;
   html: string;
 }) => {
-  const user = process.env.SMTP_USER;
+  const smtpUser = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  if (!user || !pass) {
+  if (!smtpUser || !pass) {
     throw new Error('SMTP credentials not configured');
   }
 
@@ -219,15 +219,19 @@ const sendEmailViaGmail = async (mailOptions: {
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
-    auth: { user, pass },
+    auth: { user: smtpUser, pass },
   });
 
+  // Use SMTP_USER as from, fallback to default if empty
+  const fromAddress = smtpUser || 'enigmolabs@gmail.com';
+
   await transporter.sendMail({
-    from: user,
+    from: fromAddress,
     to: mailOptions.to.join(', '),
     subject: mailOptions.subject,
     text: mailOptions.text,
     html: mailOptions.html,
+    // No replyTo field as we don't have user email in application
   });
 };
 
@@ -261,13 +265,11 @@ export async function POST(request: Request) {
     const timestamp = formatTimestamp();
     const mail = buildApplicationEmail(application, timestamp);
 
-    const recipientList = (process.env.APPLY_TO_EMAIL || DEFAULT_APPLICATION_INBOX)
-      .split(',')
-      .map((address) => address.trim())
-      .filter(Boolean);
+    // Destination: use TO_EMAIL with fallback to enigmolabs@gmail.com
+    const destinationEmail = process.env.TO_EMAIL || 'enigmolabs@gmail.com';
 
     await sendEmailViaGmail({
-      to: recipientList,
+      to: [destinationEmail],
       subject: mail.subject,
       text: mail.text,
       html: mail.html,

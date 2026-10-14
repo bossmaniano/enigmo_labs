@@ -142,9 +142,9 @@ ${brief}
       html: string;
       replyTo?: string;
     }) => {
-      const user = process.env.SMTP_USER;
+      const smtpUser = process.env.SMTP_USER;
       const pass = process.env.SMTP_PASS;
-      if (!user || !pass) {
+      if (!smtpUser || !pass) {
         throw new Error('SMTP credentials not configured');
       }
 
@@ -152,11 +152,14 @@ ${brief}
         host: 'smtp.gmail.com',
         port: 465,
         secure: true,
-        auth: { user, pass },
+        auth: { user: smtpUser, pass },
       });
 
+      // Use SMTP_USER as from, fallback to default if empty
+      const fromAddress = smtpUser || DEFAULT_TO_EMAIL;
+
       await transporter.sendMail({
-        from: user,
+        from: fromAddress,
         to: mailOptions.to.join(', '),
         subject: mailOptions.subject,
         text: mailOptions.text,
@@ -171,14 +174,14 @@ ${brief}
         subject: adminMailOptions.subject,
         text: adminMailOptions.text,
         html: adminMailOptions.html,
-        replyTo: email,
+        replyTo: email, // user's email
       }),
       sendEmail({
         to: [email],
         subject: senderMailOptions.subject,
         text: senderMailOptions.text,
         html: senderMailOptions.html,
-        replyTo: toEmail,
+        replyTo: toEmail, // site email
       }),
     ]);
 
