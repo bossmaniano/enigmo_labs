@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { MailerNotConfiguredError, sendMail } from '@/lib/mailer';
+import nodemailer from 'nodemailer';
 
 const DEFAULT_TO_EMAIL = 'enigmolabs@gmail.com';
 
@@ -135,15 +135,45 @@ ${brief}
       `,
     };
 
+    const sendEmail = async (mailOptions: {
+      to: string[];
+      subject: string;
+      text: string;
+      html: string;
+      replyTo?: string;
+    }) => {
+      const user = process.env.SMTP_USER;
+      const pass = process.env.SMTP_PASS;
+      if (!user || !pass) {
+        throw new Error('SMTP credentials not configured');
+      }
+
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: { user, pass },
+      });
+
+      await transporter.sendMail({
+        from: user,
+        to: mailOptions.to.join(', '),
+        subject: mailOptions.subject,
+        text: mailOptions.text,
+        html: mailOptions.html,
+        ...(mailOptions.replyTo ? { replyTo: mailOptions.replyTo } : {}),
+      });
+    };
+
     await Promise.all([
-      sendMail({
+      sendEmail({
         to: [toEmail],
         subject: adminMailOptions.subject,
         text: adminMailOptions.text,
         html: adminMailOptions.html,
         replyTo: email,
       }),
-      sendMail({
+      sendEmail({
         to: [email],
         subject: senderMailOptions.subject,
         text: senderMailOptions.text,
@@ -157,14 +187,6 @@ ${brief}
       { status: 200 },
     );
   } catch (error) {
-    if (error instanceof MailerNotConfiguredError) {
-      console.error(`[api/contact] ${error.message}`);
-      return NextResponse.json(
-        { error: 'Email service not configured.' },
-        { status: 503 },
-      );
-    }
-
     console.error('Contact form error:', error);
     return NextResponse.json(
       { error: 'Failed to send message. Please retry or contact enigmolabs@gmail.com directly.' },

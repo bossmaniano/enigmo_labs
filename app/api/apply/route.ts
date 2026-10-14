@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
 import type { SmeApplication, SmeTermKey } from '@/lib/types';
-import {
-  MailerNotConfiguredError,
-  escapeHtml,
-  getMailerConfigs,
-  sendMail,
-} from '@/lib/mailer';
+import { escapeHtml } from '@/lib/mailer';
 import { CONTACT_INFO, SME_PROGRAM, SME_TERMS } from '@/lib/data';
 
 export const runtime = 'nodejs';
@@ -58,15 +54,11 @@ interface SmtpFailure {
  * object.
  */
 const logSendFailure = (error: unknown): void => {
-  const configured = getMailerConfigs()
-    .map((config) => config.provider)
-    .join('+');
-
   if (typeof error === 'object' && error !== null) {
     const { code, command, responseCode, message, resendName, statusCode } =
       error as SmtpFailure;
     console.error(
-      `[api/apply] mail send failed | configured=${configured || 'none'} code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} resendName=${String(resendName)} statusCode=${String(statusCode)} message=${String(message)}`,
+      `[api/apply] mail send failed | code=${String(code)} command=${String(command)} responseCode=${String(responseCode)} resendName=${String(resendName)} statusCode=${String(statusCode)} message=${String(message)}`,
     );
   }
 
@@ -143,10 +135,10 @@ const renderRow = (
   value: string,
   isHighlighted = false,
 ): string => `
-      <tr>
-        <td style="padding:12px 16px;border-bottom:1px solid #27272a;color:#94a3b8;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;">${escapeHtml(label)}</td>
-        <td style="padding:12px 16px;border-bottom:1px solid #27272a;color:${isHighlighted ? '#fbbf24' : '#fafafa'};font-size:14px;font-weight:${isHighlighted ? '700' : '400'};word-break:break-word;">${escapeHtml(value)}</td>
-      </tr>`;
+       <tr>
+         <td style="padding:12px 16px;border-bottom:1px solid #27272a;color:#94a3b8;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;">${escapeHtml(label)}</td>
+         <td style="padding:12px 16px;border-bottom:1px solid #27272a;color:${isHighlighted ? '#fbbf24' : '#fafafa'};font-size:14px;font-weight:${isHighlighted ? '700' : '400'};word-break:break-word;">${escapeHtml(value)}</td>
+       </tr>`;
 
 const buildApplicationEmail = (application: SmeApplication, timestamp: string) => ({
   subject: `[SME Program Application] - ${application.businessName}`,
@@ -211,6 +203,34 @@ const buildApplicationEmail = (application: SmeApplication, timestamp: string) =
 </html>`,
 });
 
+const sendEmailViaGmail = async (mailOptions: {
+  to: string[];
+  subject: string;
+  text: string;
+  html: string;
+}) => {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) {
+    throw new Error('SMTP credentials not configured');
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+  });
+
+  await transporter.sendMail({
+    from: user,
+    to: mailOptions.to.join(', '),
+    subject: mailOptions.subject,
+    text: mailOptions.text,
+    html: mailOptions.html,
+  });
+};
+
 export async function POST(request: Request) {
   try {
     if (isRateLimited(getClientKey(request))) {
@@ -241,11 +261,13 @@ export async function POST(request: Request) {
     const timestamp = formatTimestamp();
     const mail = buildApplicationEmail(application, timestamp);
 
-    await sendMail({
-      to: (process.env.APPLY_TO_EMAIL || DEFAULT_APPLICATION_INBOX)
-        .split(',')
-        .map((address) => address.trim())
-        .filter(Boolean),
+    const recipientList = (process.env.APPLY_TO_EMAIL || DEFAULT_APPLICATION_INBOX)
+      .split(',')
+      .map((address) => address.trim())
+      .filter(Boolean);
+
+    await sendEmailViaGmail({
+      to: recipientList,
       subject: mail.subject,
       text: mail.text,
       html: mail.html,
@@ -260,8 +282,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    if (error instanceof MailerNotConfiguredError) {
-      console.error(`[api/apply] ${error.message}`);
+    if (error.message === 'SMTP credentials not configured') {
+      console.error(`[api/apply] SMTP credentials not configured`);
       return NextResponse.json(
         { error: 'Email service not configured.' },
         { status: 503 },
