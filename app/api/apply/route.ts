@@ -265,8 +265,8 @@ export async function POST(request: Request) {
     const timestamp = formatTimestamp();
     const mail = buildApplicationEmail(application, timestamp);
 
-    // Destination: use TO_EMAIL with fallback to enigmolabs@gmail.com
-    const destinationEmail = process.env.TO_EMAIL || 'enigmolabs@gmail.com';
+    // Destination: use TO_EMAIL with fallback to DEFAULT_APPLICATION_INBOX (which is CONTACT_INFO.email)
+    const destinationEmail = process.env.TO_EMAIL || DEFAULT_APPLICATION_INBOX;
 
     await sendEmailViaGmail({
       to: [destinationEmail],
@@ -284,7 +284,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    if (error.message === 'SMTP credentials not configured') {
+    if (error instanceof Error && error.message === 'SMTP credentials not configured') {
       console.error(`[api/apply] SMTP credentials not configured`);
       return NextResponse.json(
         { error: 'Email service not configured.' },
