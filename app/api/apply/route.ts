@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import type { SmeApplication, SmeTermKey } from '@/lib/types';
 import { escapeHtml } from '@/lib/mailer';
 import { CONTACT_INFO, SME_PROGRAM, SME_TERMS } from '@/lib/data';
@@ -203,38 +203,6 @@ const buildApplicationEmail = (application: SmeApplication, timestamp: string) =
 </html>`,
 });
 
-const sendEmailViaGmail = async (mailOptions: {
-  to: string[];
-  subject: string;
-  text: string;
-  html: string;
-}) => {
-  const smtpUser = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  if (!smtpUser || !pass) {
-    throw new Error('SMTP credentials not configured');
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: { user: smtpUser, pass },
-  });
-
-  // Use SMTP_USER as from, fallback to default if empty
-  const fromAddress = smtpUser || 'enigmolabs@gmail.com';
-
-  await transporter.sendMail({
-    from: fromAddress,
-    to: mailOptions.to.join(', '),
-    subject: mailOptions.subject,
-    text: mailOptions.text,
-    html: mailOptions.html,
-    // No replyTo field as we don't have user email in application
-  });
-};
-
 export async function POST(request: Request) {
   try {
     if (isRateLimited(getClientKey(request))) {
@@ -268,12 +236,22 @@ export async function POST(request: Request) {
     // Destination: use TO_EMAIL with fallback to DEFAULT_APPLICATION_INBOX (which is CONTACT_INFO.email)
     const destinationEmail = process.env.TO_EMAIL || DEFAULT_APPLICATION_INBOX;
 
-    await sendEmailViaGmail({
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const { data, error } = await resend.emails.send({
+      from: 'onboarding@resend.dev',
       to: [destinationEmail],
       subject: mail.subject,
       text: mail.text,
       html: mail.html,
     });
+
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json(
       { success: true, message: SME_PROGRAM.successMessage },
@@ -282,14 +260,6 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof ApplicationValidationError) {
       return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    if (error instanceof Error && error.message === 'SMTP credentials not configured') {
-      console.error(`[api/apply] SMTP credentials not configured`);
-      return NextResponse.json(
-        { error: 'Email service not configured.' },
-        { status: 503 },
-      );
     }
 
     logSendFailure(error);

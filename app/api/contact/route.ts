@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const DEFAULT_TO_EMAIL = 'enigmolabs@gmail.com';
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const toEmail = process.env.TO_EMAIL || DEFAULT_TO_EMAIL;
 
     // Email to Enigmo Labs
-    const adminMailOptions = {
+    const mailOptions = {
       subject: `New Contact Form Submission from ${name}`,
       text: `
 Name: ${name}
@@ -72,118 +72,22 @@ ${brief}
       `,
     };
 
-    // Confirmation email to sender
-    const senderMailOptions = {
-      subject: 'We received your message — Enigmo Labs',
-      text: `
-Hi ${name},
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-Thank you for reaching out to Enigmo Labs. We've received your message and will get back to you within 12 business hours.
+    const { data, error } = await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: [toEmail],
+      subject: mailOptions.subject,
+      text: mailOptions.text,
+      html: mailOptions.html,
+    });
 
-Your submission details:
-- Protocol: ${protocol || 'Not specified'}
-- Phone: ${phone || 'Not provided'}
-
-Your message:
-${brief}
-
-Best regards,
-Enigmo Labs Team
-enigmolabs@gmail.com
-+254 768 810 657
-Nairobi, Kenya
-      `,
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: monospace; background: #0a0a0a; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 24px; color: #38bdf8; }
-    .container * { color: #38bdf8 !important; }
-    .header { font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 16px; }
-    .content { line-height: 1.8; }
-    .detail { background: #0c1a2b; border: 1px solid #1e293b; border-radius: 6px; padding: 16px; margin: 16px 0; white-space: pre-wrap; }
-    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #1e293b; font-size: 12px; }
-    strong { font-weight: 700; }
-    p { margin: 12px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">> MESSAGE RECEIVED</div>
-    <div class="content">
-      <p>Hi ${name},</p>
-      <p>Thank you for reaching out to <strong>Enigmo Labs</strong>. We have received your message and will get back to you within <strong>12 business hours</strong>.</p>
-      <div class="detail">
-<strong>Your submission details:</strong>
-- Protocol: ${protocol || 'Not specified'}
-- Phone: ${phone || 'Not provided'}
-
-<strong>Your message:</strong>
-${brief}
-      </div>
-      <p>Best regards,<br><strong>Enigmo Labs Team</strong></p>
-    </div>
-    <div class="footer">
-      enigmolabs@gmail.com | +254 768 810 657 | Nairobi, Kenya
-    </div>
-  </div>
-</body>
-</html>
-      `,
-    };
-
-    const sendEmail = async (mailOptions: {
-      to: string[];
-      subject: string;
-      text: string;
-      html: string;
-      replyTo?: string;
-    }) => {
-      const smtpUser = process.env.SMTP_USER;
-      const pass = process.env.SMTP_PASS;
-      if (!smtpUser || !pass) {
-        throw new Error('SMTP credentials not configured');
-      }
-
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: { user: smtpUser, pass },
-      });
-
-      // Use SMTP_USER as from, fallback to default if empty
-      const fromAddress = smtpUser || DEFAULT_TO_EMAIL;
-
-      await transporter.sendMail({
-        from: fromAddress,
-        to: mailOptions.to.join(', '),
-        subject: mailOptions.subject,
-        text: mailOptions.text,
-        html: mailOptions.html,
-        ...(mailOptions.replyTo ? { replyTo: mailOptions.replyTo } : {}),
-      });
-    };
-
-    await Promise.all([
-      sendEmail({
-        to: [toEmail],
-        subject: adminMailOptions.subject,
-        text: adminMailOptions.text,
-        html: adminMailOptions.html,
-        replyTo: email, // user's email
-      }),
-      sendEmail({
-        to: [email],
-        subject: senderMailOptions.subject,
-        text: senderMailOptions.text,
-        html: senderMailOptions.html,
-        replyTo: toEmail, // site email
-      }),
-    ]);
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json(
       { success: true, message: 'Message received successfully.' },
